@@ -98,12 +98,12 @@ public class BlockInfoGui extends MCRGBBaseGui {
         block.getStateManager().getStates().forEach(state -> {
             try{
                 var model = client.getBakedModelManager().getBlockModels().getModel(state);
-                sprites.add(model.getQuads(state, Direction.UP, Random.create()).get(0).getSprite());
-                sprites.add(model.getQuads(state, Direction.DOWN, Random.create()).get(0).getSprite());
-                sprites.add(model.getQuads(state, Direction.NORTH, Random.create()).get(0).getSprite());
-                sprites.add(model.getQuads(state, Direction.SOUTH, Random.create()).get(0).getSprite());
-                sprites.add(model.getQuads(state, Direction.EAST, Random.create()).get(0).getSprite());
-                sprites.add(model.getQuads(state, Direction.WEST, Random.create()).get(0).getSprite());
+                sprites.add(model.getParts(Random.create()).getFirst().getQuads(Direction.UP).get(0).sprite());
+                sprites.add(model.getParts(Random.create()).getFirst().getQuads(Direction.DOWN).get(0).sprite());
+                sprites.add(model.getParts(Random.create()).getFirst().getQuads(Direction.NORTH).get(0).sprite());
+                sprites.add(model.getParts(Random.create()).getFirst().getQuads(Direction.SOUTH).get(0).sprite());
+                sprites.add(model.getParts(Random.create()).getFirst().getQuads(Direction.EAST).get(0).sprite());
+                sprites.add(model.getParts(Random.create()).getFirst().getQuads(Direction.WEST).get(0).sprite());
             }catch(Exception e){
                 return;
             }

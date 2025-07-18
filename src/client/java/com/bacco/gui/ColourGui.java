@@ -517,7 +517,7 @@ public class ColourGui extends MCRGBBaseGui {
 
     public void UpdateArmour(){
         int hexint = GetColour();
-        DyedColorComponent dyedColorComponent = new DyedColorComponent(hexint,true);
+        DyedColorComponent dyedColorComponent = new DyedColorComponent(hexint);
         helmet.set(DataComponentTypes.DYED_COLOR,dyedColorComponent);
         chestplate.set(DataComponentTypes.DYED_COLOR,dyedColorComponent);
         leggings.set(DataComponentTypes.DYED_COLOR,dyedColorComponent);
