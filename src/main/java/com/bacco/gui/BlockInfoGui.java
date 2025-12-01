@@ -39,7 +39,7 @@ public class BlockInfoGui extends MCRGBBaseGui {
 
 
 
-    public BlockInfoGui(net.minecraft.client.MinecraftClient client, MCRGBClient mcrgbClient, ItemStack stack, ColourVector launchColour){
+    public BlockInfoGui(net.minecraft.client.Minecraft client, MCRGBClient mcrgbClient, ItemStack stack, ColourVector launchColour){
 
         this.client = client;
         this.mcrgbClient = mcrgbClient;

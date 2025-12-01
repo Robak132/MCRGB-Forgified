@@ -18,7 +18,7 @@ public class WClickableLabel extends WLabel {
     ColourVector colour;
     MCRGBBaseGui gui;
 
-    net.minecraft.client.MinecraftClient client;
+    net.minecraft.client.Minecraft client;
     MCRGBClient mcrgbClient;
 
     Text textUnhovered = text;

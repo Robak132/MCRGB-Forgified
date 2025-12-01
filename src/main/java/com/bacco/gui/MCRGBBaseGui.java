@@ -20,7 +20,7 @@ public class MCRGBBaseGui extends LightweightGuiDescription {
 
     ColourVector inputColour = new ColourVector(255,255,255);
 
-    net.minecraft.client.MinecraftClient client;
+    net.minecraft.client.Minecraft client;
     MCRGBClient mcrgbClient;
 
     WSprite colourDisplay = new WSprite(Identifier.of("mcrgb", "rect.png"));

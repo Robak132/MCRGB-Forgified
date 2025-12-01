@@ -29,7 +29,7 @@ public class WPickableTexture extends WSprite {
     MCRGBBaseGui gui;
 
     int glID;
-    public WPickableTexture(Identifier image, float u1, float v1, float u2, float v2, net.minecraft.client.MinecraftClient client, MCRGBBaseGui gui) {
+    public WPickableTexture(Identifier image, float u1, float v1, float u2, float v2, net.minecraft.client.Minecraft client, MCRGBBaseGui gui) {
         super(image, u1, v1, u2, v2);
         glID = client.getTextureManager().getTexture(image).getGlId();
         //get width and height from OpenGL by binding texture

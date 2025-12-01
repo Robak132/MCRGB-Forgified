@@ -5,15 +5,15 @@ import com.bacco.*;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.*;
 import io.github.cottonmc.cotton.gui.widget.icon.TextureIcon;
-import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.chat.Component;
 import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 
@@ -26,7 +26,7 @@ public class ColourGui extends MCRGBBaseGui {
     static int slotsHeight = 7;
     static int slotsWidth = 9;
 
-    WLabel label = new WLabel(Text.translatable("ui.mcrgb.header"));
+    WLabel label = new WLabel(Component.translatable("ui.mcrgb.header"));
 
     public WBlockInfoBox infoBox;
 
@@ -44,28 +44,27 @@ public class ColourGui extends MCRGBBaseGui {
             PlaceSlots();
             setValue(getValue() + (int) -vAmount);
 		    return InputResult.PROCESSED;
-            //return super.onMouseScroll(x, y, hAmount, vAmount);
         }
 
     };
     WPlainPanel labels = new WPlainPanel();
-    WLabel rLabel = new WLabel(Text.translatable("ui.mcrgb.r_for_red"),0xFFFF0000);
-    WLabel gLabel = new WLabel(Text.translatable("ui.mcrgb.g_for_green"),0xFF00FF00);
-    WLabel bLabel = new WLabel(Text.translatable("ui.mcrgb.b_for_blue"),0xFF0000FF);
+    WLabel rLabel = new WLabel(Component.translatable("ui.mcrgb.r_for_red"),0xFFFF0000);
+    WLabel gLabel = new WLabel(Component.translatable("ui.mcrgb.g_for_green"),0xFF00FF00);
+    WLabel bLabel = new WLabel(Component.translatable("ui.mcrgb.b_for_blue"),0xFF0000FF);
     WSlider rSlider = new WSlider(0, 255, Axis.VERTICAL);
     WSlider gSlider = new WSlider(0, 255, Axis.VERTICAL);
     WSlider bSlider = new WSlider(0, 255, Axis.VERTICAL);
     WPlainPanel inputs = new WPlainPanel();
-    WTextField rInput = new WTextField(Text.literal(Integer.toString(inputColour.r)));
-    WTextField gInput = new WTextField(Text.literal(Integer.toString(inputColour.g)));
-    WTextField bInput = new WTextField(Text.literal(Integer.toString(inputColour.b)));
+    WTextField rInput = new WTextField(Component.literal(Integer.toString(inputColour.r)));
+    WTextField gInput = new WTextField(Component.literal(Integer.toString(inputColour.g)));
+    WTextField bInput = new WTextField(Component.literal(Integer.toString(inputColour.b)));
     Identifier refreshIdentifier = Identifier.of("mcrgb", "refresh.png");
     TextureIcon refreshIcon = new TextureIcon(refreshIdentifier);
     WButton refreshButton = new WButton(refreshIcon){
         @Environment(EnvType.CLIENT)
         @Override
         public void addTooltip(TooltipBuilder tooltip) {
-            tooltip.add(Text.translatable("ui.mcrgb.refresh_info"));
+            tooltip.add(Component.translatable("ui.mcrgb.refresh_info"));
             super.addTooltip(tooltip);
         }
     };
@@ -73,11 +72,11 @@ public class ColourGui extends MCRGBBaseGui {
     TextureIcon settingsIcon = new TextureIcon(settingsIdentifier);
     WButton settingsButton = new WButton(settingsIcon);
 
-    WButton rgbButton = new WButton(Text.translatable("ui.mcrgb.rgb"));
-    WButton hsvButton = new WButton(Text.translatable("ui.mcrgb.hsv"));
-    WButton hslButton = new WButton(Text.translatable("ui.mcrgb.hsl"));
-    private ArrayList<ItemStack> stacks = new ArrayList<ItemStack>();
-    private ArrayList<WColourGuiSlot> wColourGuiSlots = new ArrayList<WColourGuiSlot>();
+    WButton rgbButton = new WButton(Component.translatable("ui.mcrgb.rgb"));
+    WButton hsvButton = new WButton(Component.translatable("ui.mcrgb.hsv"));
+    WButton hslButton = new WButton(Component.translatable("ui.mcrgb.hsl"));
+    private final ArrayList<ItemStack> stacks = new ArrayList<ItemStack>();
+    private final ArrayList<WColourGuiSlot> wColourGuiSlots = new ArrayList<WColourGuiSlot>();
     ItemStack helmet = new ItemStack(Items.LEATHER_HELMET);
     ItemStack chestplate = new ItemStack(Items.LEATHER_CHESTPLATE);
     ItemStack leggings = new ItemStack(Items.LEATHER_LEGGINGS);
@@ -110,7 +109,7 @@ public class ColourGui extends MCRGBBaseGui {
 
 
 
-    WTextField searchField = new WTextField(Text.translatable("ui.mcrgb.refine")){
+    WTextField searchField = new WTextField(Component.translatable("ui.mcrgb.refine")){
 
         @Override
         public void setSize(int x, int y) {
@@ -153,7 +152,7 @@ public class ColourGui extends MCRGBBaseGui {
     ColourMode mode = ColourMode.RGB;
 
     @Environment(value=EnvType.CLIENT)
-    public ColourGui(MinecraftClient client, MCRGBClient mcrgbClient, ColourVector launchColour){
+    public ColourGui(Minecraft client, MCRGBClient mcrgbClient, ColourVector launchColour){
         this.client = client;
         this.mcrgbClient = mcrgbClient;
         colourWheel = new WColourWheel(wheelIdentifier,0,0,1,1,client,this);
@@ -241,20 +240,16 @@ public class ColourGui extends MCRGBBaseGui {
 
         refreshButton.setOnClick(() -> {mcrgbClient.RefreshColours(); ColourSort();});
 
-        rgbButton.setOnClick(() -> {SetColourMode(ColourMode.RGB);});
-        hsvButton.setOnClick(() -> {SetColourMode(ColourMode.HSV);});
-        hslButton.setOnClick(() -> {SetColourMode(ColourMode.HSL);});
+        rgbButton.setOnClick(() -> SetColourMode(ColourMode.RGB));
+        hsvButton.setOnClick(() -> SetColourMode(ColourMode.HSV));
+        hslButton.setOnClick(() -> SetColourMode(ColourMode.HSL));
 
-        colourWheelToggle.setOnToggle(isToggled -> {ToggleColourWheel(isToggled);});
+        colourWheelToggle.setOnToggle(isToggled -> ToggleColourWheel(isToggled));
 
         if (FabricLoader.getInstance().isModLoaded("cloth-config2")) {
-            settingsButton.setOnClick(() -> {
-                MinecraftClient.getInstance().setScreen(ClothConfigIntegration.getConfigScreen(client.currentScreen));
-            });
+            settingsButton.setOnClick(() -> Minecraft.getInstance().setScreen(ClothConfigIntegration.getConfigScreen(client.currentScreen)));
         }else{
-            settingsButton.setOnClick(() -> {
-                client.player.sendMessage(Text.translatable("warning.mcrgb.noclothconfig"), false);
-            });
+            settingsButton.setOnClick(() -> client.player.sendMessage(Component.translatable("warning.mcrgb.noclothconfig"), false));
         }
         UpdateArmour();
 
@@ -285,11 +280,11 @@ public class ColourGui extends MCRGBBaseGui {
 
         switch (mode){
             case RGB:
-                rLabel.setText(Text.translatable("ui.mcrgb.r_for_red"));
+                rLabel.setText(Component.translatable("ui.mcrgb.r_for_red"));
                 rLabel.setColor(0xFFFF0000);
-                gLabel.setText(Text.translatable("ui.mcrgb.g_for_green"));
+                gLabel.setText(Component.translatable("ui.mcrgb.g_for_green"));
                 gLabel.setColor(0xFF00FF00);
-                bLabel.setText(Text.translatable("ui.mcrgb.b_for_blue"));
+                bLabel.setText(Component.translatable("ui.mcrgb.b_for_blue"));
                 bLabel.setColor(0xFF0000FF);
 
                 rSlider.setMinValue(0);
@@ -303,11 +298,11 @@ public class ColourGui extends MCRGBBaseGui {
                 hslButton.setEnabled(true);
                 break;
             case HSV:
-                rLabel.setText(Text.translatable("ui.mcrgb.h_for_hue_hsv"));
+                rLabel.setText(Component.translatable("ui.mcrgb.h_for_hue_hsv"));
                 rLabel.setColor(0xFF3F3F3F);
-                gLabel.setText(Text.translatable("ui.mcrgb.s_for_sat_hsv"));
+                gLabel.setText(Component.translatable("ui.mcrgb.s_for_sat_hsv"));
                 gLabel.setColor(0xFF3F3F3F);
-                bLabel.setText(Text.translatable("ui.mcrgb.v_for_val_hsv"));
+                bLabel.setText(Component.translatable("ui.mcrgb.v_for_val_hsv"));
                 bLabel.setColor(0xFF3F3F3F);
                 rSlider.setMinValue(0);
                 gSlider.setMinValue(0);
@@ -320,11 +315,11 @@ public class ColourGui extends MCRGBBaseGui {
                 hslButton.setEnabled(true);
                 break;
             case HSL:
-                rLabel.setText(Text.translatable("ui.mcrgb.h_for_hue_hsl"));
+                rLabel.setText(Component.translatable("ui.mcrgb.h_for_hue_hsl"));
                 rLabel.setColor(0xFF3F3F3F);
-                gLabel.setText(Text.translatable("ui.mcrgb.s_for_sat_hsl"));
+                gLabel.setText(Component.translatable("ui.mcrgb.s_for_sat_hsl"));
                 gLabel.setColor(0xFF3F3F3F);
-                bLabel.setText(Text.translatable("ui.mcrgb.l_for_lit_hsl"));
+                bLabel.setText(Component.translatable("ui.mcrgb.l_for_lit_hsl"));
                 bLabel.setColor(0xFF3F3F3F);
                 rSlider.setMinValue(0);
                 gSlider.setMinValue(0);
@@ -383,67 +378,67 @@ public class ColourGui extends MCRGBBaseGui {
             switch (mode){
                 case RGB:
                     if(!rInput.isFocused() & !gInput.isFocused() & !bInput.isFocused()) return;
-                    if(Integer.valueOf(value) > 255 || Integer.valueOf(value) < 0) return;
+                    if(Integer.parseInt(value) > 255 || Integer.parseInt(value) < 0) return;
 
                     if (d == 'r'){
-                        if (inputColour.r == Integer.valueOf(value)) return;
-                        inputColour.r = Integer.valueOf(value);
+                        if (inputColour.r == Integer.parseInt(value)) return;
+                        inputColour.r = Integer.parseInt(value);
                         rSlider.setValue(inputColour.r);
                     }
                     if (d == 'g'){
-                        if (inputColour.g == Integer.valueOf(value)) return;
-                        inputColour.g = Integer.valueOf(value);
+                        if (inputColour.g == Integer.parseInt(value)) return;
+                        inputColour.g = Integer.parseInt(value);
                         gSlider.setValue(inputColour.g);
                     }
                     if (d == 'b'){
-                        if (inputColour.b == Integer.valueOf(value)) return;
-                        inputColour.b = Integer.valueOf(value);
+                        if (inputColour.b == Integer.parseInt(value)) return;
+                        inputColour.b = Integer.parseInt(value);
                         bSlider.setValue(inputColour.b);
                     }
                     break;
                 case HSV:
                     if(!rInput.isFocused() & !gInput.isFocused() & !bInput.isFocused()) return;
                     if(d == 'r'){
-                        if(Integer.valueOf(value) > 360 || Integer.valueOf(value) < 0) return;
+                        if(Integer.parseInt(value) > 360 || Integer.parseInt(value) < 0) return;
                     }else{
-                        if(Integer.valueOf(value) > 100 || Integer.valueOf(value) < 0) return;
+                        if(Integer.parseInt(value) > 100 || Integer.parseInt(value) < 0) return;
                     }
 
 
                     if (d == 'r'){
-                        if (inputColour.r == Integer.valueOf(value)) return;
-                        rSlider.setValue(Integer.valueOf(value));
+                        if (inputColour.r == Integer.parseInt(value)) return;
+                        rSlider.setValue(Integer.parseInt(value));
                     }
                     if (d == 'g'){
-                        if (inputColour.g == Integer.valueOf(value)) return;
-                        gSlider.setValue(Integer.valueOf(value));
+                        if (inputColour.g == Integer.parseInt(value)) return;
+                        gSlider.setValue(Integer.parseInt(value));
                     }
                     if (d == 'b'){
-                        if (inputColour.b == Integer.valueOf(value)) return;
-                        bSlider.setValue(Integer.valueOf(value));
+                        if (inputColour.b == Integer.parseInt(value)) return;
+                        bSlider.setValue(Integer.parseInt(value));
                     }
                     inputColour.fromHSV(rSlider.getValue(),gSlider.getValue(),bSlider.getValue());
                     break;
                 case HSL:
                     if(!rInput.isFocused() & !gInput.isFocused() & !bInput.isFocused()) return;
                     if(d == 'r'){
-                        if(Integer.valueOf(value) > 360 || Integer.valueOf(value) < 0) return;
+                        if(Integer.parseInt(value) > 360 || Integer.parseInt(value) < 0) return;
                     }else{
-                        if(Integer.valueOf(value) > 100 || Integer.valueOf(value) < 0) return;
+                        if(Integer.parseInt(value) > 100 || Integer.parseInt(value) < 0) return;
                     }
 
 
                     if (d == 'r'){
-                        if (inputColour.r == Integer.valueOf(value)) return;
-                        rSlider.setValue(Integer.valueOf(value));
+                        if (inputColour.r == Integer.parseInt(value)) return;
+                        rSlider.setValue(Integer.parseInt(value));
                     }
                     if (d == 'g'){
-                        if (inputColour.g == Integer.valueOf(value)) return;
-                        gSlider.setValue(Integer.valueOf(value));
+                        if (inputColour.g == Integer.parseInt(value)) return;
+                        gSlider.setValue(Integer.parseInt(value));
                     }
                     if (d == 'b'){
-                        if (inputColour.b == Integer.valueOf(value)) return;
-                        bSlider.setValue(Integer.valueOf(value));
+                        if (inputColour.b == Integer.parseInt(value)) return;
+                        bSlider.setValue(Integer.parseInt(value));
                     }
                     inputColour.fromHSL(rSlider.getValue(),gSlider.getValue(),bSlider.getValue());
                     break;
@@ -467,7 +462,7 @@ public class ColourGui extends MCRGBBaseGui {
                 enableSliderListeners = true;
                 return;
             }
-            if(!modeChanged && value == inputColour.getHex()){
+            if(!modeChanged && value.equals(inputColour.getHex())){
                 enableSliderListeners = true;
                 return;
             }
@@ -528,8 +523,8 @@ public class ColourGui extends MCRGBBaseGui {
             try{
                 for(int j = 0; j < ((IItemBlockColourSaver) block.asItem()).getLength(); j++){
                     double distance = 0;
-                    double weightless = 0;
-                    double weight = 0;
+                    double weightless;
+                    double weight;
                     SpriteDetails sprite = ((IItemBlockColourSaver) block.asItem()).getSpriteDetails(j);
                     for (int i = 0; i < sprite.colourinfo.size(); i++){
                         ColourVector colour = sprite.colourinfo.get(i);
@@ -557,12 +552,12 @@ public class ColourGui extends MCRGBBaseGui {
         scrollBar.setMaxValue(stacks.size()/ slotsWidth + slotsWidth);
 
         //sort list
-        Collections.sort(stacks, new Comparator<ItemStack>(){
+        stacks.sort(new Comparator<ItemStack>() {
             @Override
             public int compare(ItemStack is1, ItemStack is2) {
-                double x = ((IItemBlockColourSaver)is1.getItem()).getScore();
-                double y = ((IItemBlockColourSaver)is2.getItem()).getScore();
-                return Double.compare(x,y);
+                double x = ((IItemBlockColourSaver) is1.getItem()).getScore();
+                double y = ((IItemBlockColourSaver) is2.getItem()).getScore();
+                return Double.compare(x, y);
             }
         });
         PlaceSlots();
@@ -633,7 +628,7 @@ public class ColourGui extends MCRGBBaseGui {
         PlaceSlots();
     }
 
-    public void OpenBlockInfoGui(net.minecraft.client.MinecraftClient client, MCRGBClient mcrgbClient, ItemStack stack){
+    public void OpenBlockInfoGui(net.minecraft.client.Minecraft client, MCRGBClient mcrgbClient, ItemStack stack){
         client.setScreen(new ColourScreen(new BlockInfoGui(client,mcrgbClient,stack, inputColour)));
     }
 

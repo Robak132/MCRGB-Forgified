@@ -1,8 +1,9 @@
 package com.bacco;
 
-import io.github.cottonmc.cotton.gui.widget.data.Color.RGB;
 
 import java.awt.*;
+
+import static com.mojang.blaze3d.platform.NativeImage.Format.RGB;
 
 public class ColourVector {
     public int r, g, b;

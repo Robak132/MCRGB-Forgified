@@ -47,7 +47,7 @@ public class MCRGBClient implements ClientModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("mcrgb");
 	public static final boolean readMode = false;
-	public net.minecraft.client.MinecraftClient client;
+	public net.minecraft.client.Minecraft client;
 	int totalBlocks = 0;			
 	int fails = 0;
 	int successes = 0;

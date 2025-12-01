@@ -4,7 +4,7 @@ import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.data.InputResult;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
@@ -14,7 +14,7 @@ public class WColourWheel extends WPickableTexture{
     int cursorY = (height)/2;
     Boolean beenClicked = false;
 
-    public WColourWheel(Identifier image, float u1, float v1, float u2, float v2, MinecraftClient client, MCRGBBaseGui gui) {
+    public WColourWheel(Identifier image, float u1, float v1, float u2, float v2, Minecraft client, MCRGBBaseGui gui) {
         super(image, u1, v1, u2, v2, client, gui);
     }
 

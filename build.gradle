@@ -1,6 +1,9 @@
 plugins {
-	id 'fabric-loom' version '1.8-SNAPSHOT'
+    id 'idea'
+    id 'java'
+    id 'java-library'
 	id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '6.0.+'
 }
 
 version = project.mod_version
@@ -10,86 +13,123 @@ base {
 	archivesName = project.archives_base_name
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
+minecraft {
+    mappings channel: mapping_channel, version: mc_version
+    copyIdeResources = true
+    generateRunFolders = true
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        server {
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        gameTestServer {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        data {
+            workingDirectory project.file('run-data')
+
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 repositories {
+    flatDir { dir 'libs' }
+    maven {
+        name = "Progwml6 maven"
+        url = 'https://dvs1.progwml6.com/files/maven/'
+    }
+    maven {
+        name = "curios"
+        url = 'https://maven.theillusivec4.top/'
+    }
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://www.cursemaven.com'  }
     maven {
         name = "CottonMC"
         url = "https://server.bbkr.space/artifactory/libs-release"
     }
-	maven { url "https://maven.shedaniel.me/" }
-	maven { url "https://maven.terraformersmc.com/releases/" }
-}
-
-loom {
-    splitEnvironmentSourceSets()
-
-	mods {
-		"mcrgb" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
-		}
-	}
-
+    maven { url = 'https://maven.parchmentmc.org' }
+    maven { url "https://maven.shedaniel.me/" }
+    maven { url "https://maven.terraformersmc.com/releases/" }
+    maven { url "https://maven.su5ed.dev/releases" }
+    maven { url "https://maven.minecraftforge.net" }
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	// Uncomment the following line to enable the deprecated Fabric API modules. 
-	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
-
-	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
-	modImplementation include("io.github.cottonmc:LibGui:8.1.1+1.20.1")
-	modApi "me.shedaniel.cloth:cloth-config-fabric:11.1.136"
-	modApi "com.terraformersmc:modmenu:7.2.2"
+    minecraft "net.minecraftforge:forge:1.20.1-47.1.0"
+//    implementation "org.parchmentmc:mcp-mappings:2024.06.19-1.20.1"
+//    implementation "me.shedaniel.cloth:cloth-config-forge:11.1.136"
+//    implementation ("io.github.cottonmc:LibGui:8.1.1+1.20.1") {
+//        transitive = false
+//    }
+//    compileOnly "dev.su5ed.sinytra.fabric-api:fabric-api:0.92.6+1.11.14+1.20.1"
+//    runtimeOnly fg.deobf("dev.su5ed.sinytra.fabric-api:fabric-api:0.92.6+1.11.14+1.20.1")
 }
 
-processResources {
-	inputs.property "version", project.version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            mc_version: mc_version, flib_version: flib_version,
+            loader_version_range: loader_version_range,
+            neo_version_range: neo_version_range, neo_version: neo_version,
+            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors: mod_authors, mod_description: mod_description
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+    finalizedBy 'reobfJar'
+}
+
+tasks.register('cleanJar') {
+    delete 'build/libs'
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
-}
-
-java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
-
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
-jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }

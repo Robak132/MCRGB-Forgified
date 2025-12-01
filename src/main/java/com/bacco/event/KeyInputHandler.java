@@ -1,28 +1,29 @@
 package com.bacco.event;
 
 import com.bacco.ColourVector;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 
 import com.bacco.MCRGBClient;
 import com.bacco.gui.ColourGui;
 import com.bacco.gui.ColourScreen;
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import static net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK;
+
 
 public class KeyInputHandler {
     public static final String KEY_CATEGORY_MCRGB = "key.category.mcrgb.mcrgb";
     public static final String KEY_COLOUR_INV_OPEN = "key.mcrgb.colour_inv_open";
 
-    public static KeyBinding colourInvKey;
+    public static KeyMapping colourInvKey;
 
 
     public static void registerKeyInputs(MCRGBClient mcrgbClient){
-        ClientTickEvents.END_CLIENT_TICK.register(client ->{
-            if(colourInvKey.wasPressed()){
-                if (client.currentScreen == null) {
+        END_CLIENT_TICK.register(client ->{
+            if (colourInvKey.consumeClick()){
+                if (client.screen == null) {
                     client.setScreen(new ColourScreen(new ColourGui(client, mcrgbClient, new ColourVector(0xFFFFFFFF))));
 				} else {
 					client.setScreen(null);
@@ -32,9 +33,9 @@ public class KeyInputHandler {
     }
 
     public static void register(MCRGBClient mcrgbClient){
-        colourInvKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            KEY_COLOUR_INV_OPEN, 
-            InputUtil.Type.KEYSYM,
+        colourInvKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+            KEY_COLOUR_INV_OPEN,
+            InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_I,
             KEY_CATEGORY_MCRGB
             ));

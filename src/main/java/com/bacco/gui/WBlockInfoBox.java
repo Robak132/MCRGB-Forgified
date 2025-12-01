@@ -6,7 +6,7 @@ import io.github.cottonmc.cotton.gui.client.BackgroundPainter;
 import io.github.cottonmc.cotton.gui.widget.WBox;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import io.github.cottonmc.cotton.gui.widget.data.Insets;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.MutableText;
@@ -46,7 +46,7 @@ public class WBlockInfoBox extends WBox {
                     }else{
                         text2 = (MutableText) text.getWithStyle(Style.EMPTY.withColor(0x444444)).get(0);//.withColor(0x444444);
                     }
-                    TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+                    TextRenderer textRenderer = Minecraft.getInstance().textRenderer;
                     int width = textRenderer.getWidth(text2);
                     WClickableLabel newLabel = new WClickableLabel(text2,new ColourVector(colours.get(j)), gui);
                     newLabel.hoveredProperty();
