@@ -1,0 +1,24 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"compatibilityLevel": "JAVA_17",
+	"package": "io.github.cottonmc.cotton.gui.impl.mixin",
+	"plugin": "io.github.cottonmc.cotton.gui.impl.LibGuiMixinPlugin",
+
+	"mixins": [
+		"ScreenHandlerAccessor"
+	],
+	"client": [
+		"client.DrawContextAccessor",
+		"client.HandledScreenMixin",
+		"client.MinecraftClientMixin",
+		"client.PressableWidgetAccessor",
+		"client.ScreenAccessor",
+		"client.SliderWidgetAccessor",
+		"client.TextFieldWidgetAccessor"
+	],
+
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

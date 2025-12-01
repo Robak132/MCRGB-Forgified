@@ -2,29 +2,28 @@ package io.github.cottonmc.cotton.gui.widget;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 
 import io.github.cottonmc.cotton.gui.client.LibGui;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
-import io.github.cottonmc.cotton.gui.impl.client.ComponentAlignment;
+import io.github.cottonmc.cotton.gui.impl.client.TextAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.InputResult;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
-
-import javax.annotation.Nullable;
-import java.awt.*;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A single-line label widget.
  */
 public class WLabel extends WWidget {
-	protected Component text;
+	protected Text text;
 	protected HorizontalAlignment horizontalAlignment = HorizontalAlignment.LEFT;
 	protected VerticalAlignment verticalAlignment = VerticalAlignment.TOP;
 	protected int color;
@@ -47,7 +46,7 @@ public class WLabel extends WWidget {
 	 * @param text the text of the label
 	 * @param color the color of the label
 	 */
-	public WLabel(Component text, int color) {
+	public WLabel(Text text, int color) {
 		this.text = text;
 		this.color = color;
 		this.darkmodeColor = (color==DEFAULT_TEXT_COLOR) ? DEFAULT_DARKMODE_TEXT_COLOR : color;
@@ -59,33 +58,33 @@ public class WLabel extends WWidget {
 	 * @param text the text of the label
 	 * @since 1.8.0
 	 */
-	public WLabel(Component text) {
+	public WLabel(Text text) {
 		this(text, DEFAULT_TEXT_COLOR);
 	}
 
 	@Environment(EnvType.CLIENT)
 	@Override
 	public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
-		int yOffset = ComponentAlignment.getComponentOffsetY(verticalAlignment, height, 1);
+		int yOffset = TextAlignment.getTextOffsetY(verticalAlignment, height, 1);
 
 		if (getDrawShadows()) {
-			ScreenDrawing.drawStringWithShadow(context, text.asOrderedComponent(), horizontalAlignment, x, y + yOffset, this.getWidth(), shouldRenderInDarkMode() ? darkmodeColor : color);
+			ScreenDrawing.drawStringWithShadow(context, text.asOrderedText(), horizontalAlignment, x, y + yOffset, this.getWidth(), shouldRenderInDarkMode() ? darkmodeColor : color);
 		} else {
-			ScreenDrawing.drawString(context, text.asOrderedComponent(), horizontalAlignment, x, y + yOffset, this.getWidth(), shouldRenderInDarkMode() ? darkmodeColor : color);
+			ScreenDrawing.drawString(context, text.asOrderedText(), horizontalAlignment, x, y + yOffset, this.getWidth(), shouldRenderInDarkMode() ? darkmodeColor : color);
 		}
 
-		Style hoveredComponentStyle = getComponentStyleAt(mouseX, mouseY);
-		ScreenDrawing.drawComponentHover(context, hoveredComponentStyle, x + mouseX, y + mouseY);
+		Style hoveredTextStyle = getTextStyleAt(mouseX, mouseY);
+		ScreenDrawing.drawTextHover(context, hoveredTextStyle, x + mouseX, y + mouseY);
 	}
 
 	@Environment(EnvType.CLIENT)
 	@Override
 	public InputResult onClick(Click click, boolean doubled) {
-		Style hoveredComponentStyle = getComponentStyleAt((int) click.x(), (int) click.y());
-		if (hoveredComponentStyle != null) {
-			Screen screen = Minecraft.getInstance().screen;
+		Style hoveredTextStyle = getTextStyleAt((int) click.x(), (int) click.y());
+		if (hoveredTextStyle != null) {
+			Screen screen = MinecraftClient.getInstance().currentScreen;
 			if (screen != null) {
-				return InputResult.of(screen.handleComponentClick(hoveredComponentStyle));
+				return InputResult.of(screen.handleTextClick(hoveredTextStyle));
 			}
 		}
 
@@ -101,10 +100,10 @@ public class WLabel extends WWidget {
 	 */
 	@Environment(EnvType.CLIENT)
 	@Nullable
-	public Style getComponentStyleAt(int x, int y) {
+	public Style getTextStyleAt(int x, int y) {
 		if (isWithinBounds(x, y)) {
-			int xOffset = ComponentAlignment.getComponentOffsetX(horizontalAlignment, width, text.asOrderedComponent());
-			return MinecraftClient.getInstance().textRenderer.getComponentHandler().getStyleAt(text, x - xOffset);
+			int xOffset = TextAlignment.getTextOffsetX(horizontalAlignment, width, text.asOrderedText());
+			return MinecraftClient.getInstance().textRenderer.getTextHandler().getStyleAt(text, x - xOffset);
 		}
 		return null;
 	}
@@ -210,7 +209,7 @@ public class WLabel extends WWidget {
 	 *
 	 * @return the text
 	 */
-	public Component getComponent() {
+	public Text getText() {
 		return text;
 	}
 
@@ -220,7 +219,7 @@ public class WLabel extends WWidget {
 	 * @param text the new text
 	 * @return this label
 	 */
-	public WLabel setComponent(Component text) {
+	public WLabel setText(Text text) {
 		this.text = text;
 		return this;
 	}

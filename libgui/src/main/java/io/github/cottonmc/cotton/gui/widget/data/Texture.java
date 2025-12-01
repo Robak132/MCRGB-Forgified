@@ -1,6 +1,6 @@
 package io.github.cottonmc.cotton.gui.widget.data;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Identifier;
 
 import java.util.Objects;
 
@@ -43,7 +43,7 @@ import java.util.Objects;
  * <code>{@link io.github.cottonmc.cotton.gui.client.ScreenDrawing ScreenDrawing}.texturedRect()</code>
  * when the {@link #type() type} is {@link Type#STANDALONE}. GUI sprites need specialised code for drawing them,
  * and they need to be drawn with specific {@code Texture}-accepting methods
- * or {@link net.minecraft.client.gui.GuiGraphics}.
+ * or {@link net.minecraft.client.gui.DrawContext}.
  *
  * <p>GUI sprite textures don't currently support flipping the texture by flipping UV coordinates.
  *
@@ -55,7 +55,7 @@ import java.util.Objects;
  * @param v2 the end V-coordinate, between 0 and 1
  * @since 3.0.0
  */
-public record Texture(ResourceLocation image, Type type, float u1, float v1, float u2, float v2) {
+public record Texture(Identifier image, Type type, float u1, float v1, float u2, float v2) {
 	/**
 	 * Constructs a new texture that uses the full image.
 	 *
@@ -63,7 +63,7 @@ public record Texture(ResourceLocation image, Type type, float u1, float v1, flo
 	 * @param type  the type
 	 * @throws NullPointerException if the image or the type is null
 	 */
-	public Texture(ResourceLocation image, Type type) {
+	public Texture(Identifier image, Type type) {
 		this(image, type, 0, 0, 1, 1);
 	}
 
@@ -77,7 +77,7 @@ public record Texture(ResourceLocation image, Type type, float u1, float v1, flo
 	 * @param v2 the end V-coordinate, between 0 and 1
 	 * @throws NullPointerException if the image is null
 	 */
-	public Texture(ResourceLocation image, float u1, float v1, float u2, float v2) {
+	public Texture(Identifier image, float u1, float v1, float u2, float v2) {
 		this(image, Type.STANDALONE, u1, v1, u2, v2);
 	}
 
@@ -87,7 +87,7 @@ public record Texture(ResourceLocation image, Type type, float u1, float v1, flo
 	 * @param image the image
 	 * @throws NullPointerException if the image is null
 	 */
-	public Texture(ResourceLocation image) {
+	public Texture(Identifier image) {
 		this(image, Type.STANDALONE, 0, 0, 1, 1);
 	}
 
