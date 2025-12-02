@@ -6,8 +6,9 @@ import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WSprite;
 import io.github.cottonmc.cotton.gui.widget.WTextField;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class MCRGBBaseGui extends LightweightGuiDescription {
 
@@ -18,32 +19,24 @@ public class MCRGBBaseGui extends LightweightGuiDescription {
 
     WTextField hexInput = new WTextField(Component.literal("#FFFFFF"));
 
-    ColourVector inputColour = new ColourVector(255,255,255);
+    ColourVector inputColour = new ColourVector(255, 255, 255);
 
-    net.minecraft.client.Minecraft client;
+    Minecraft client;
     MCRGBClient mcrgbClient;
 
-    WSprite colourDisplay = new WSprite(Identifier.of("mcrgb", "rect.png"));
+    WSprite colourDisplay = new WSprite(ResourceLocation.tryBuild("mcrgb", "rect.png"));
 
-
-
-
-    MCRGBBaseGui(){
+    MCRGBBaseGui() {
     }
 
-
-    int GetColour(){
-        String hex = inputColour.getHex().replace("#","");
-        return Integer.parseInt(hex,16);
+    int getColour() {
+        String hex = inputColour.getHex().replace("#", "");
+        return Integer.parseInt(hex, 16);
     }
 
-    void SetColour(ColourVector colour){
-
+    void setColour(ColourVector colour) {
         inputColour = colour;
         hexInput.setText(inputColour.getHex());
         colourDisplay.setOpaqueTint(inputColour.asInt());
-
-
     }
-
 }

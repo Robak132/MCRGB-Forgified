@@ -1,11 +1,15 @@
 package com.bacco;
 
 
+import io.github.cottonmc.cotton.gui.widget.data.Color.RGB;
+
 import java.awt.*;
 
 
 public class ColourVector {
-    public int r, g, b;
+    public int r;
+    public int g;
+    public int b;
 
     public ColourVector(int r, int g, int b){
         this.r = r;

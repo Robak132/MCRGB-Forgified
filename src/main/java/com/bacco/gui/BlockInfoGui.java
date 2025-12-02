@@ -3,22 +3,21 @@ package com.bacco.gui;
 import com.bacco.ColourVector;
 import com.bacco.IItemBlockColourSaver;
 import com.bacco.MCRGBClient;
-import io.github.cottonmc.cotton.gui.widget.WGridPanel;
-import io.github.cottonmc.cotton.gui.widget.WLabel;
-import io.github.cottonmc.cotton.gui.widget.WScrollPanel;
-import io.github.cottonmc.cotton.gui.widget.data.Axis;
+import io.github.cottonmc.cotton.gui.widget.*;
+import io.github.cottonmc.cotton.gui.widget.data.CottonAxis;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.Insets;
 import io.github.cottonmc.cotton.gui.widget.icon.TextureIcon;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
@@ -68,25 +67,23 @@ public class BlockInfoGui extends MCRGBBaseGui {
 
 
         mainPanel.add(label, 0, 0, 2, 1);
-        label.setText(stack.getName());
+        label.setText(stack.getHoverName());
 
         mainPanel.add(backButton, 17, 0, 1, 1);
         backButton.setSize(20, 20);
         backButton.setIconSize(18);
         backButton.setAlignment(HorizontalAlignment.LEFT);
 
-        backButton.setOnClick(() -> {
-            client.setScreen(new ColourScreen(new ColourGui(client, mcrgbClient, inputColour)));
-        });
+        backButton.setOnClick(() -> client.setScreen(new ColourScreen(new ColourGui(client, mcrgbClient, inputColour))));
 
-        infoBox = new WBlockInfoBox(Axis.VERTICAL, (IItemBlockColourSaver) stack.getItem(), this);
+        infoBox = new WBlockInfoBox(CottonAxis.VERTICAL, (IItemBlockColourSaver) stack.getItem(), this);
         infoScrollPanel = new WScrollPanel(infoBox);
 
         mainPanel.add(this.infoScrollPanel, 11, 3, 7, 9);
 
         mainPanel.add(savedPalettesArea, 0, 7);
 
-        SetColour(launchColour);
+        setColour(launchColour);
 
 
         BlockItem bi = (BlockItem) stack.getItem();
@@ -97,7 +94,7 @@ public class BlockInfoGui extends MCRGBBaseGui {
 
         block.getStateDefinition().getPossibleStates().forEach(state -> {
             try {
-                var model = client.getModelManager().getBlockModelShaper().getBlockModel(state);
+                BakedModel model = client.getModelManager().getBlockModelShaper().getBlockModel(state);
                 sprites.add(model.getQuads(state, Direction.UP, RandomSource.create()).get(0).getSprite());
                 sprites.add(model.getQuads(state, Direction.DOWN, RandomSource.create()).get(0).getSprite());
                 sprites.add(model.getQuads(state, Direction.NORTH, RandomSource.create()).get(0).getSprite());
@@ -105,6 +102,7 @@ public class BlockInfoGui extends MCRGBBaseGui {
                 sprites.add(model.getQuads(state, Direction.EAST, RandomSource.create()).get(0).getSprite());
                 sprites.add(model.getQuads(state, Direction.WEST, RandomSource.create()).get(0).getSprite());
             } catch (Exception e) {
+                // Ignored
             }
         });
         if (sprites.isEmpty()) {
@@ -115,11 +113,11 @@ public class BlockInfoGui extends MCRGBBaseGui {
 
         int length = sprites.size();
         for (int i = 0; i < length; i++) {
-            WTextureThumbnail thumbnail = new WTextureThumbnail(spritesAL.get(i).atlasLocation(), spritesAL.get(i).getMinU(), spritesAL.get(i).getMinV(), spritesAL.get(i).getMaxU(), spritesAL.get(i).getMaxV(), i, this);
+            WTextureThumbnail thumbnail = new WTextureThumbnail(spritesAL.get(i).atlasLocation(), spritesAL.get(i).getU0(), spritesAL.get(i).getV0(), spritesAL.get(i).getU1(), spritesAL.get(i).getV1(), i, this);
             textureThumbs.add(thumbnail, i % 3, Math.floorDiv(i, 3));
         }
 
-        blockTexture = new WPickableTexture(spritesAL.get(0).atlasLocation(), spritesAL.get(0).getMinU(), spritesAL.get(0).getMinV(), spritesAL.get(0).getMaxU(), spritesAL.get(0).getMaxV(), client, this);
+        blockTexture = new WPickableTexture(spritesAL.get(0).atlasLocation(), spritesAL.get(0).getU0(), spritesAL.get(0).getV0(), spritesAL.get(0).getU1(), spritesAL.get(0).getV1(), client, this);
 
         mainPanel.add(blockTexture, 0, 1, 6, 6);
         mainPanel.add(textureThumbs, 7, 1, 3, 6);
@@ -147,9 +145,8 @@ public class BlockInfoGui extends MCRGBBaseGui {
 
             inputColour = colour;
             colourDisplay.setOpaqueTint(inputColour.asInt());
-
-
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            // Ignored
         }
     }
 

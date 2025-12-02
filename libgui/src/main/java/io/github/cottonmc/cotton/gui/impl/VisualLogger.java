@@ -1,15 +1,16 @@
 package io.github.cottonmc.cotton.gui.impl;
 
+import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
-import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.FormattedCharSequence;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,58 +23,58 @@ import java.util.List;
  * A "logger" that renders its messages on the screen in dev envs.
  */
 public final class VisualLogger {
-	private static final List<Text> WARNINGS = new ArrayList<>();
+    private static final List<Component> WARNINGS = new ArrayList<>();
 
-	private final Logger logger;
-	private final Class<?> clazz;
+    private final Logger logger;
+    private final Class<?> clazz;
 
-	public VisualLogger(Class<?> clazz) {
-		logger = LogManager.getLogger(clazz);
-		this.clazz = clazz;
-	}
+    public VisualLogger(Class<?> clazz) {
+        logger = LogManager.getLogger(clazz);
+        this.clazz = clazz;
+    }
 
-	public void error(String message, Object... params) {
-		log(message, params, Level.ERROR, Formatting.RED);
-	}
+    @Environment(EnvType.CLIENT)
+    public static void render(GuiGraphics context) {
+        Minecraft client = Minecraft.getInstance();
+        Font textRenderer = client.font;
+        int width = client.getWindow().getGuiScaledWidth();
+        List<FormattedCharSequence> lines = new ArrayList<>();
 
-	public void warn(String message, Object... params) {
-		log(message, params, Level.WARN, Formatting.GOLD);
-	}
+        for (Component warning : WARNINGS) {
+            lines.addAll(textRenderer.split(warning, width));
+        }
 
-	private void log(String message, Object[] params, Level level, Formatting formatting) {
-		logger.log(level, message, params);
+        int fontHeight = textRenderer.lineHeight;
+        int y = 0;
 
-		if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
-			var text = Text.literal(clazz.getSimpleName() + '/');
-			text.append(Text.literal(level.name()).formatted(formatting));
-			text.append(Text.literal(": " + ParameterizedMessage.format(message, params)));
+        for (var line : lines) {
+            ScreenDrawing.coloredRect(context, 2, 2 + y, textRenderer.width(line), fontHeight, 0x88_000000);
+            ScreenDrawing.drawString(context, line, 2, 2 + y, 0xFF_FFFFFF);
+            y += fontHeight;
+        }
+    }
 
-			WARNINGS.add(text);
-		}
-	}
+    public static void reset() {
+        WARNINGS.clear();
+    }
 
-	@Environment(EnvType.CLIENT)
-	public static void render(DrawContext context) {
-		var client = MinecraftClient.getInstance();
-		var textRenderer = client.textRenderer;
-		int width = client.getWindow().getScaledWidth();
-		List<OrderedText> lines = new ArrayList<>();
+    public void error(String message, Object... params) {
+        log(message, params, Level.ERROR, ChatFormatting.RED);
+    }
 
-		for (Text warning : WARNINGS) {
-			lines.addAll(textRenderer.wrapLines(warning, width));
-		}
+    public void warn(String message, Object... params) {
+        log(message, params, Level.WARN, ChatFormatting.GOLD);
+    }
 
-		int fontHeight = textRenderer.fontHeight;
-		int y = 0;
+    private void log(String message, Object[] params, Level level, ChatFormatting formatting) {
+        logger.log(level, message, params);
 
-		for (var line : lines) {
-			ScreenDrawing.coloredRect(context, 2, 2 + y, textRenderer.getWidth(line), fontHeight, 0x88_000000);
-			ScreenDrawing.drawString(context, line, 2, 2 + y, 0xFF_FFFFFF);
-			y += fontHeight;
-		}
-	}
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            MutableComponent text = Component.literal(clazz.getSimpleName() + '/');
+            text.append(Component.literal(level.name()).withStyle(formatting));
+            text.append(Component.literal(": " + ParameterizedMessage.format(message, params)));
 
-	public static void reset() {
-		WARNINGS.clear();
-	}
+            WARNINGS.add(text);
+        }
+    }
 }

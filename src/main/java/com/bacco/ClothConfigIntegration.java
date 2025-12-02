@@ -16,11 +16,11 @@ public class ClothConfigIntegration {
 
     private static class Internal {
         private static final Function<Boolean, Component> alwaysShowToolTipsTextSupplier = bool -> {
-            if (bool) return Component.translatable("options.mcrgb.all_contexts");
+            if (Boolean.TRUE.equals(bool)) return Component.translatable("options.mcrgb.all_contexts");
             else return Component.translatable("options.mcrgb.picker_only");
         };
         private static final Function<Boolean, Component> sliderConstantUpdateTextSupplier = bool -> {
-            if (bool) return Component.translatable("options.mcrgb.while_scrolling");
+            if (Boolean.TRUE.equals(bool)) return Component.translatable("options.mcrgb.while_scrolling");
             else return Component.translatable("options.mcrgb.after_scrolling");
         };
         protected static Screen getConfigScreen() {

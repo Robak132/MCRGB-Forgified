@@ -1,12 +1,5 @@
 package io.github.cottonmc.cotton.gui.client;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-
 import io.github.cottonmc.cotton.gui.GuiDescription;
 import io.github.cottonmc.cotton.gui.impl.VisualLogger;
 import io.github.cottonmc.cotton.gui.impl.client.CottonScreenImpl;
@@ -17,247 +10,250 @@ import io.github.cottonmc.cotton.gui.impl.mixin.client.ScreenAccessor;
 import io.github.cottonmc.cotton.gui.widget.WPanel;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
 import io.github.cottonmc.cotton.gui.widget.data.InputResult;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 public class CottonClientScreen extends Screen implements CottonScreenImpl {
-	private static final VisualLogger LOGGER = new VisualLogger(CottonInventoryScreen.class);
-	protected GuiDescription description;
-	protected int left = 0;
-	protected int top = 0;
+    private static final VisualLogger LOGGER = new VisualLogger(CottonInventoryScreen.class);
+    private final MouseInputHandler<CottonClientScreen> mouseInputHandler = new MouseInputHandler<>(this);
+    protected GuiDescription description;
+    protected int left = 0;
+    protected int top = 0;
+    /**
+     * The X coordinate of the screen title.
+     * This is relative to the root panel's top-left corner.
+     *
+     * @since 2.0.0
+     */
+    protected int titleX;
+    /**
+     * The Y coordinate of the screen title.
+     * This is relative to the root panel's top-left corner.
+     *
+     * @since 2.0.0
+     */
+    protected int titleY;
+    @Nullable
+    protected WWidget lastResponder = null;
 
-	/**
-	 * The X coordinate of the screen title.
-	 * This is relative to the root panel's top-left corner.
-	 *
-	 * @since 2.0.0
-	 */
-	protected int titleX;
+    public CottonClientScreen(GuiDescription description) {
+        this(CommonComponents.EMPTY, description);
+    }
 
-	/**
-	 * The Y coordinate of the screen title.
-	 * This is relative to the root panel's top-left corner.
-	 *
-	 * @since 2.0.0
-	 */
-	protected int titleY;
+    public CottonClientScreen(Component title, GuiDescription description) {
+        super(title);
+        this.description = description;
+        description.getRootPanel().validate(description);
+    }
 
-	@Nullable
-	protected WWidget lastResponder = null;
+    @Override
+    public GuiDescription getDescription() {
+        return description;
+    }
 
-	private final MouseInputHandler<CottonClientScreen> mouseInputHandler = new MouseInputHandler<>(this);
+    @Override
+    public void init() {
+        super.init();
 
-	public CottonClientScreen(GuiDescription description) {
-		this(ScreenTexts.EMPTY, description);
-	}
+        WPanel root = description.getRootPanel();
+        if (root != null) root.addPainters();
+        description.addPainters();
+        reposition(width, height);
 
-	public CottonClientScreen(Text title, GuiDescription description) {
-		super(title);
-		this.description = description;
-		description.getRootPanel().validate(description);
-	}
+        if (root != null) {
+            GuiEventListener rootPanelElement = FocusElements.ofPanel(root);
+            ((ScreenAccessor) this).getChildren().add(rootPanelElement);
+            setInitialFocus(rootPanelElement);
+        } else {
+            LOGGER.warn("No root panel found, keyboard navigation disabled");
+        }
+    }
 
-	@Override
-	public GuiDescription getDescription() {
-		return description;
-	}
+    @Override
+    public void removed() {
+        super.removed();
+        VisualLogger.reset();
+    }
 
-	@Override
-	public void init() {
-		super.init();
+    @Nullable
+    @Override
+    public WWidget getLastResponder() {
+        return lastResponder;
+    }
 
-		WPanel root = description.getRootPanel();
-		if (root != null) root.addPainters();
-		description.addPainters();
-		reposition(width, height);
+    @Override
+    public void setLastResponder(@Nullable WWidget lastResponder) {
+        this.lastResponder = lastResponder;
+    }
 
-		if (root != null) {
-			Element rootPanelElement = FocusElements.ofPanel(root);
-			((ScreenAccessor) this).libgui$getChildren().add(rootPanelElement);
-			setInitialFocus(rootPanelElement);
-		} else {
-			LOGGER.warn("No root panel found, keyboard navigation disabled");
-		}
-	}
+    /**
+     * Repositions the root panel.
+     *
+     * @param screenWidth  the width of the screen
+     * @param screenHeight the height of the screen
+     */
+    protected void reposition(int screenWidth, int screenHeight) {
+        if (description != null) {
+            WPanel root = description.getRootPanel();
+            if (root != null) {
+                titleX = description.getTitlePos().x();
+                titleY = description.getTitlePos().y();
 
-	@Override
-	public void removed() {
-		super.removed();
-		VisualLogger.reset();
-	}
+                if (!description.isFullscreen()) {
+                    this.left = (screenWidth - root.getWidth()) / 2;
+                    this.top = (screenHeight - root.getHeight()) / 2;
+                } else {
+                    this.left = 0;
+                    this.top = 0;
 
-	@Nullable
-	@Override
-	public WWidget getLastResponder() {
-		return lastResponder;
-	}
+                    root.setSize(screenWidth, screenHeight);
+                }
+            }
+        }
+    }
 
-	@Override
-	public void setLastResponder(@Nullable WWidget lastResponder) {
-		this.lastResponder = lastResponder;
-	}
+    private void paint(GuiGraphics context, int mouseX, int mouseY) {
+        renderBackground(context);
 
-	/**
-	 * Repositions the root panel.
-	 *
-	 * @param screenWidth  the width of the screen
-	 * @param screenHeight the height of the screen
-	 */
-	protected void reposition(int screenWidth, int screenHeight) {
-		if (description!=null) {
-			WPanel root = description.getRootPanel();
-			if (root!=null) {
-				titleX = description.getTitlePos().x();
-				titleY = description.getTitlePos().y();
+        if (description != null) {
+            WPanel root = description.getRootPanel();
+            if (root != null) {
+                GL11.glEnable(GL11.GL_SCISSOR_TEST);
+                Scissors.refreshScissors();
+                root.paint(context, left, top, mouseX - left, mouseY - top);
+                GL11.glDisable(GL11.GL_SCISSOR_TEST);
+                Scissors.checkStackIsEmpty();
+            }
 
-				if (!description.isFullscreen()) {
-					this.left = (screenWidth - root.getWidth()) / 2;
-					this.top = (screenHeight - root.getHeight()) / 2;
-				} else {
-					this.left = 0;
-					this.top = 0;
+            if (getTitle() != null && description.isTitleVisible()) {
+                int width = description.getRootPanel().getWidth();
+                ScreenDrawing.drawString(context, getTitle().getVisualOrderText(), description.getTitleAlignment(), left + titleX, top + titleY, width - 2 * titleX, description.getTitleColor());
+            }
+        }
+    }
 
-					root.setSize(screenWidth, screenHeight);
-				}
-			}
-		}
-	}
+    @Override
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+        paint(context, mouseX, mouseY);
 
-	private void paint(DrawContext context, int mouseX, int mouseY) {
-		renderBackground(context);
+        super.render(context, mouseX, mouseY, partialTicks);
 
-		if (description!=null) {
-			WPanel root = description.getRootPanel();
-			if (root!=null) {
-				GL11.glEnable(GL11.GL_SCISSOR_TEST);
-				Scissors.refreshScissors();
-				root.paint(context, left, top, mouseX-left, mouseY-top);
-				GL11.glDisable(GL11.GL_SCISSOR_TEST);
-				Scissors.checkStackIsEmpty();
-			}
+        if (description != null) {
+            WPanel root = description.getRootPanel();
+            if (root != null) {
+                WWidget hitChild = root.hit(mouseX - left, mouseY - top);
+                if (hitChild != null) hitChild.renderTooltip(context, left, top, mouseX - left, mouseY - top);
+            }
+        }
 
-			if (getTitle() != null && description.isTitleVisible()) {
-				int width = description.getRootPanel().getWidth();
-				ScreenDrawing.drawString(context, getTitle().asOrderedText(), description.getTitleAlignment(), left + titleX, top + titleY, width - 2 * titleX, description.getTitleColor());
-			}
-		}
-	}
+        VisualLogger.render(context);
+    }
 
-	@Override
-	public void render(DrawContext context, int mouseX, int mouseY, float partialTicks) {
-		paint(context, mouseX, mouseY);
-		
-		super.render(context, mouseX, mouseY, partialTicks);
-		
-		if (description!=null) {
-			WPanel root = description.getRootPanel();
-			if (root!=null) {
-				WWidget hitChild = root.hit(mouseX-left, mouseY-top);
-				if (hitChild!=null) hitChild.renderTooltip(context, left, top, mouseX-left, mouseY-top);
-			}
-		}
+    @Override
+    public void tick() {
+        super.tick();
+        if (description != null) {
+            WPanel root = description.getRootPanel();
+            if (root != null) {
+                root.tick();
+            }
+        }
+    }
 
-		VisualLogger.render(context);
-	}
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
 
-	@Override
-	public void tick() {
-		super.tick();
-		if (description!=null) {
-			WPanel root = description.getRootPanel();
-			if (root!=null) {
-				root.tick();
-			}
-		}
-	}
+        int containerX = (int) mouseX - left;
+        int containerY = (int) mouseY - top;
+        mouseInputHandler.checkFocus(containerX, containerY);
+        if (containerX < 0 || containerY < 0 || containerX >= width || containerY >= height) return true;
+        mouseInputHandler.onMouseDown(containerX, containerY, mouseButton);
 
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-		super.mouseClicked(mouseX, mouseY, mouseButton);
+        return true;
+    }
 
-		int containerX = (int)mouseX-left;
-		int containerY = (int)mouseY-top;
-		mouseInputHandler.checkFocus(containerX, containerY);
-		if (containerX<0 || containerY<0 || containerX>=width || containerY>=height) return true;
-		mouseInputHandler.onMouseDown(containerX, containerY, mouseButton);
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int mouseButton) {
+        super.mouseReleased(mouseX, mouseY, mouseButton);
 
-		return true;
-	}
+        int containerX = (int) mouseX - left;
+        int containerY = (int) mouseY - top;
+        mouseInputHandler.onMouseUp(containerX, containerY, mouseButton);
 
-	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int mouseButton) {
-		super.mouseReleased(mouseX, mouseY, mouseButton);
+        return true;
+    }
 
-		int containerX = (int)mouseX-left;
-		int containerY = (int)mouseY-top;
-		mouseInputHandler.onMouseUp(containerX, containerY, mouseButton);
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double deltaX, double deltaY) {
+        super.mouseDragged(mouseX, mouseY, mouseButton, deltaX, deltaY);
 
-		return true;
-	}
+        int containerX = (int) mouseX - left;
+        int containerY = (int) mouseY - top;
+        mouseInputHandler.onMouseDrag(containerX, containerY, mouseButton, deltaX, deltaY);
 
-	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double deltaX, double deltaY) {
-		super.mouseDragged(mouseX, mouseY, mouseButton, deltaX, deltaY);
+        return true;
+    }
 
-		int containerX = (int)mouseX-left;
-		int containerY = (int)mouseY-top;
-		mouseInputHandler.onMouseDrag(containerX, containerY, mouseButton, deltaX, deltaY);
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        super.mouseScrolled(mouseX, mouseY, amount);
 
-		return true;
-	}
+        int containerX = (int) mouseX - left;
+        int containerY = (int) mouseY - top;
+        mouseInputHandler.onMouseScroll(containerX, containerY, amount);
 
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		super.mouseScrolled(mouseX, mouseY, amount);
+        return true;
+    }
 
-		int containerX = (int)mouseX-left;
-		int containerY = (int)mouseY-top;
-		mouseInputHandler.onMouseScroll(containerX, containerY, amount);
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        super.mouseMoved(mouseX, mouseY);
 
-		return true;
-	}
+        int containerX = (int) mouseX - left;
+        int containerY = (int) mouseY - top;
+        mouseInputHandler.onMouseMove(containerX, containerY);
+    }
 
-	@Override
-	public void mouseMoved(double mouseX, double mouseY) {
-		super.mouseMoved(mouseX, mouseY);
+    @Override
+    public boolean charTyped(char ch, int keyCode) {
+        WWidget focus = description.getFocus();
+        if (focus != null && focus.onCharTyped(ch) == InputResult.PROCESSED) {
+            return true;
+        }
 
-		int containerX = (int)mouseX-left;
-		int containerY = (int)mouseY-top;
-		mouseInputHandler.onMouseMove(containerX, containerY);
-	}
+        return super.charTyped(ch, keyCode);
+    }
 
-	@Override
-	public boolean charTyped(char ch, int keyCode) {
-		WWidget focus = description.getFocus();
-		if (focus != null && focus.onCharTyped(ch) == InputResult.PROCESSED) {
-			return true;
-		}
+    @Override
+    public boolean keyPressed(int ch, int keyCode, int modifiers) {
+        WWidget focus = description.getFocus();
+        if (focus != null && focus.onKeyPressed(ch, keyCode, modifiers) == InputResult.PROCESSED) {
+            return true;
+        }
 
-		return super.charTyped(ch, keyCode);
-	}
+        return super.keyPressed(ch, keyCode, modifiers);
+    }
 
-	@Override
-	public boolean keyPressed(int ch, int keyCode, int modifiers) {
-		WWidget focus = description.getFocus();
-		if (focus != null && focus.onKeyPressed(ch, keyCode, modifiers) == InputResult.PROCESSED) {
-			return true;
-		}
+    @Override
+    public boolean keyReleased(int ch, int keyCode, int modifiers) {
+        WWidget focus = description.getFocus();
+        if (focus != null && focus.onKeyReleased(ch, keyCode, modifiers) == InputResult.PROCESSED) {
+            return true;
+        }
 
-		return super.keyPressed(ch, keyCode, modifiers);
-	}
+        return super.keyReleased(ch, keyCode, modifiers);
+    }
 
-	@Override
-	public boolean keyReleased(int ch, int keyCode, int modifiers) {
-		WWidget focus = description.getFocus();
-		if (focus != null && focus.onKeyReleased(ch, keyCode, modifiers) == InputResult.PROCESSED) {
-			return true;
-		}
-
-		return super.keyReleased(ch, keyCode, modifiers);
-	}
-
-	@Override
-	protected void addElementNarrations(NarrationMessageBuilder builder) {
-		if (description != null) NarrationHelper.addNarrations(description.getRootPanel(), builder);
-	}
+    @Override
+    protected void updateNarratedWidget(@NotNull NarrationElementOutput builder) {
+        if (description != null) NarrationHelper.addNarrations(description.getRootPanel(), builder);
+    }
 }

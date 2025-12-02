@@ -2,7 +2,8 @@ plugins {
     id 'idea'
     id 'java'
     id 'java-library'
-	id 'maven-publish'
+    id 'checkstyle'
+    id 'maven-publish'
     id 'net.minecraftforge.gradle' version '6.0.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
@@ -22,7 +23,7 @@ allprojects {
             url = 'https://maven.theillusivec4.top/'
         }
         maven { url = 'https://maven.blamejared.com' }
-        maven { url = 'https://www.cursemaven.com'  }
+        maven { url = 'https://www.cursemaven.com' }
         maven {
             name = "CottonMC"
             url = "https://server.bbkr.space/artifactory/libs-release"
@@ -44,7 +45,7 @@ version = project.mod_version
 group = project.maven_group
 
 base {
-	archivesName = project.archives_base_name
+    archivesName = project.archives_base_name
 }
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
@@ -80,10 +81,6 @@ minecraft {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
 
-        gameTestServer {
-            property 'forge.enabledGameTestNamespaces', mod_id
-        }
-
         data {
             workingDirectory project.file('run-data')
 
@@ -98,8 +95,15 @@ dependencies {
     minecraft "net.minecraftforge:forge:1.20.1-47.1.0"
     implementation "me.shedaniel.cloth:cloth-config-forge:11.1.136"
     implementation "dev.su5ed.sinytra.fabric-api:fabric-api:0.92.6+1.11.14+1.20.1"
-
+    implementation api("io.github.juuxel:libninepatch:1.2.0")
     implementation project(':libgui')
+}
+
+checkstyle {
+    toolVersion = '10.18.2'
+    configDirectory = file('config/checkstyle')
+    ignoreFailures = false
+    maxWarnings = 0
 }
 
 java {
@@ -117,11 +121,11 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
-            mc_version: mc_version, flib_version: flib_version,
+            mc_version          : mc_version, flib_version: flib_version,
             loader_version_range: loader_version_range,
-            neo_version_range: neo_version_range, neo_version: neo_version,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors: mod_authors, mod_description: mod_description
+            neo_version_range   : neo_version_range, neo_version: neo_version,
+            mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors         : mod_authors, mod_description: mod_description
     ]
     inputs.properties replaceProperties
 
@@ -147,4 +151,15 @@ tasks.named('jar', Jar).configure {
 
 tasks.register('cleanJar') {
     delete 'build/libs'
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        html.required = true
+        xml.required = false
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.withType(Checkstyle)
 }

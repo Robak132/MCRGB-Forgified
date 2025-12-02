@@ -9,113 +9,95 @@ import io.github.cottonmc.cotton.gui.widget.WWidget;
 import io.github.cottonmc.cotton.gui.widget.data.InputResult;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.MutableComponent;
-import net.minecraft.text.Style;
-import net.minecraft.text.Component;
-import net.minecraft.util.ChatFormatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 
 
-public class WColourGuiSlot extends WWidget{
-	public static final Identifier SLOT_TEXTURE = Identifier.of(LibGuiCommon.MOD_ID, "textures/widget/item_slot.png");
-   ClientPlayerEntity player = net.minecraft.client.Minecraft.getInstance().player;
-   ItemStack stack;
+public class WColourGuiSlot extends WWidget {
+    public static final ResourceLocation SLOT_TEXTURE = ResourceLocation.tryBuild(LibGuiCommon.MOD_ID, "textures/widget/item_slot.png");
+    LocalPlayer player = net.minecraft.client.Minecraft.getInstance().player;
+    ItemStack stack;
+    ColourGui gui;
 
-
-   ColourGui gui;
-   public WColourGuiSlot(ItemStack stack, ColourGui gui){
-
-      this.stack = stack;
-      this.gui = gui;
-   }
-
-   @Override
-   public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
-      context.drawItem(stack, x+1, y+1);
-      //context.drawTexture(SLOT_TEXTURE, x,y, 0, 0,0, 18, 18, 64, 64);
-      ScreenDrawing.texturedRect(context, x, y, 18, 18, SLOT_TEXTURE, 0, 0, .28125f, .28125f, 0xFFFFFFFF);
-      //context.drawTexture();
-   }
-
-   @Override
-   public InputResult onClick(int x, int y, int button) {
-      // x & y are the coordinates of the mouse when the event was triggered
-      // int button is which button was pressed
-       String nbt = "";
-       if(stack.hasNbt()) {
-           nbt = stack.getOrCreateNbt().toString();
-
-       }
-      String command = MCRGBConfig.instance.command;
-
-      command = command.replace("%c",nbt);
-      switch (button){
-         case 0:
-             if(!((player.hasPermissionLevel(2) && player.isCreative()) || MCRGBConfig.instance.bypassOP)) return InputResult.PROCESSED;
-             command = command.replace("%p",player.getName().getString());
-             command = command.replace("%i",Registries.ITEM.getId(stack.getItem()).toString());
-             command = command.replace("%q","1");
-             player.networkHandler.sendCommand(command);
-
-            //player.networkHandler.sendCommand("give @s " + Registries.ITEM.getId(stack.getItem()).toString()+nbt);
-            break;
-         case 1:
-            //player.networkHandler.sendCommand("give @s " + Registries.ITEM.getId(stack.getItem()).toString()+nbt);
-            //IItemBlockColourSaver item = (IItemBlockColourSaver) stack.getItem();
-            /*if(item.getLength() <= 0) break;
-            ArrayList<ColourVector> colours = item.getSpriteDetails(0).colourinfo;
-            ColourVector colour = colours.get(0);
-            gui.SetColour(colour);*/
-            /*gui.infoBox = new WBlockInfoBox(Axis.VERTICAL,item,gui);
-
-            //gui.mainPanel.add(this.gui.infoBox,this.getAbsoluteX()/18+1,this.getAbsoluteY()/18+1);
-            gui.mainPanel.add(this.gui.infoBox,19,0);
-            gui.mainPanel.validate(gui);
-            gui.PlaceSlots();*/
-            if(stack.getItem() instanceof BlockItem)
-               gui.OpenBlockInfoGui(gui.client, gui.mcrgbClient, stack);
-            break;
-         case 2:
-             if(!((player.hasPermissionLevel(2) && player.isCreative()) || MCRGBConfig.instance.bypassOP)) return InputResult.PROCESSED;
-             command = command.replace("%p",player.getName().getString());
-             command = command.replace("%i",Registries.ITEM.getId(stack.getItem()).toString());
-             command = command.replace("%q",Integer.toString(stack.getMaxCount()));
-             player.networkHandler.sendCommand(command);
-
-            //player.networkHandler.sendCommand("give @s " + Registries.ITEM.getId(stack.getItem()).toString()+nbt + " " + stack.getMaxCount());
-            break;
-      }
-      return InputResult.PROCESSED;
+    public WColourGuiSlot(ItemStack stack, ColourGui gui) {
+        this.stack = stack;
+        this.gui = gui;
     }
 
-   @Environment(EnvType.CLIENT)
-   @Override
-   public void addTooltip(TooltipBuilder tooltip) {
-      tooltip.add(Component.translatable(stack.getTranslationKey()));
-      IItemBlockColourSaver item = (IItemBlockColourSaver) stack.getItem();
-			for(int i = 0; i < item.getLength(); i++){
-				ArrayList<String> strings = item.getSpriteDetails(i).getStrings();
-					ArrayList<Integer> colours = item.getSpriteDetails(i).getTextColours();
-					if(strings.size() > 0){
-                  for(int j = 0; j < strings.size(); j++){
-                     var text = Component.literal(strings.get(j)).formatted(ChatFormatting.GRAY);
-                     MutableComponent text2 = (MutableComponent) Component.literal("⬛").getWithStyle(Style.EMPTY.withColor(colours.get(j))).get(0);
-                     if(j > 0){
+    @Override
+    public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
+        context.renderItem(stack, x + 1, y + 1);
+        ScreenDrawing.texturedRect(context, x, y, 18, 18, SLOT_TEXTURE, 0, 0, .28125f, .28125f, 0xFFFFFFFF);
+    }
+
+    @Override
+    public InputResult onClick(int x, int y, int button) {
+        // x & y are the coordinates of the mouse when the event was triggered
+        // int button is which button was pressed
+        String nbt = "";
+        if (stack.hasTag()) {
+            nbt = stack.getOrCreateTag().toString();
+
+        }
+        String command = MCRGBConfig.instance.command;
+
+        command = command.replace("%c", nbt);
+        switch (button) {
+            case 0:
+                if (!((player.hasPermissions(2) && player.isCreative()) || MCRGBConfig.instance.bypassOP))
+                    return InputResult.PROCESSED;
+                command = command.replace("%p", player.getName().getString());
+                command = command.replace("%i", ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+                command = command.replace("%q", "1");
+                player.connection.sendCommand(command);
+                break;
+            case 1:
+                if (stack.getItem() instanceof BlockItem)
+                    gui.OpenBlockInfoGui(gui.client, gui.mcrgbClient, stack);
+                break;
+            case 2:
+                if (!((player.hasPermissions(2) && player.isCreative()) || MCRGBConfig.instance.bypassOP))
+                    return InputResult.PROCESSED;
+                command = command.replace("%p", player.getName().getString());
+                command = command.replace("%i", ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+                command = command.replace("%q", Integer.toString(stack.getMaxStackSize()));
+                player.connection.sendCommand(command);
+                break;
+        }
+        return InputResult.PROCESSED;
+    }
+
+    @Environment(EnvType.CLIENT)
+    @Override
+    public void addTooltip(TooltipBuilder tooltip) {
+        tooltip.add(Component.translatable(stack.getDescriptionId()));
+        IItemBlockColourSaver item = (IItemBlockColourSaver) stack.getItem();
+        for (int i = 0; i < item.getLength(); i++) {
+            ArrayList<String> strings = item.getSpriteDetails(i).getStrings();
+            ArrayList<Integer> colours = item.getSpriteDetails(i).getTextColours();
+            if (!strings.isEmpty()) {
+                for (int j = 0; j < strings.size(); j++) {
+                    var text = Component.literal(strings.get(j)).withStyle(ChatFormatting.GRAY);
+                    MutableComponent text2 = (MutableComponent) Component.literal("⬛").toFlatList(Style.EMPTY.withColor(colours.get(j))).get(0);
+                    if (j > 0) {
                         text2.append(text);
-                     }else{
-                        text2 = text.formatted(ChatFormatting.DARK_GRAY);
-                     }
-                     
-                     tooltip.add(text2);
-                     }
-			         }
-               }
-         }
-   }
+                    } else {
+                        text2 = text.withStyle(ChatFormatting.DARK_GRAY);
+                    }
+
+                    tooltip.add(text2);
+                }
+            }
+        }
+    }
+}

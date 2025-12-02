@@ -1,6 +1,5 @@
 package com.bacco.gui;
 
-import com.bacco.MCRGBClient;
 import com.bacco.Palette;
 import io.github.cottonmc.cotton.gui.client.BackgroundPainter;
 import io.github.cottonmc.cotton.gui.widget.TooltipBuilder;
@@ -9,26 +8,21 @@ import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.icon.TextureIcon;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Component;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 
 public class WPaletteWidget extends WPlainPanel {
-
-    ArrayList<WColourPreviewIcon> SavedColours = new ArrayList<>();
-    Identifier colourIdentifier = Identifier.of("mcrgb", "square.png");
     int slotsWidth = 9;
+    ArrayList<WColourPreviewIcon> savedColours = new ArrayList<>();
     Palette palette;
-    Identifier editIdentifier = Identifier.of("mcrgb", "edit.png");
-    TextureIcon editIcon = new TextureIcon(editIdentifier);
-
     MCRGBBaseGui cg;
-
-    MCRGBClient mcrgbClient;
-    public Boolean editing = false;
-    WSmallButton editButton = new WSmallButton(editIcon){
+    ResourceLocation colourIdentifier = ResourceLocation.tryBuild("mcrgb", "square.png");
+    ResourceLocation editIdentifier = ResourceLocation.tryBuild("mcrgb", "edit.png");
+    TextureIcon editIcon = new TextureIcon(editIdentifier);
+    WSmallButton editButton = new WSmallButton(editIcon) {
         @Environment(EnvType.CLIENT)
         @Override
         public void addTooltip(TooltipBuilder tooltip) {
@@ -36,7 +30,7 @@ public class WPaletteWidget extends WPlainPanel {
             super.addTooltip(tooltip);
         }
     };
-    Identifier deleteIdentifier = Identifier.of("mcrgb", "delete.png");
+    ResourceLocation deleteIdentifier = ResourceLocation.tryBuild("mcrgb", "delete.png");
     TextureIcon deleteIcon = new TextureIcon(deleteIdentifier);
 
     WSmallButton deleteButton = new WSmallButton(deleteIcon){
@@ -49,38 +43,35 @@ public class WPaletteWidget extends WPlainPanel {
     };
 
     public WPaletteWidget(){
-
+        // Default constructor
     }
 
     public void buildPaletteWidget(MCRGBBaseGui cg){
 
         this.setBackgroundPainter(BackgroundPainter.createColorful(0xFFFFFF));
         for(int i = 0; i < slotsWidth; i++) {
-            SavedColours.add(new WColourPreviewIcon(colourIdentifier,cg));
-            SavedColours.get(i).setInteractable(false);
-            this.add(SavedColours.get(i), i*17, 0, 18, 18);
+            savedColours.add(new WColourPreviewIcon(colourIdentifier,cg));
+            savedColours.get(i).setInteractable(false);
+            this.add(savedColours.get(i), i*17, 0, 18, 18);
         }
         this.add(editButton,(int)(8.6f*18),0,10,10);
         editButton.setSize(10,10);
         editButton.setIconSize(9);
         editButton.setAlignment(HorizontalAlignment.LEFT);
-        editButton.setOnClick(() -> {cg.savedPalettesArea.EditPalette(this);});
+        editButton.setOnClick(() -> cg.savedPalettesArea.editPalette(this));
 
         this.add(deleteButton,(int)(8.6f*18),9,1,1);
         deleteIcon.setColor(0xFF_FC5454);
         deleteButton.setSize(10,10);
         deleteButton.setIconSize(9);
         deleteButton.setAlignment(HorizontalAlignment.LEFT);
-        deleteButton.setOnClick(() -> {cg.savedPalettesArea.DeletePalette(this);});
-
-
+        deleteButton.setOnClick(() -> cg.savedPalettesArea.deletePalette(this));
     }
     @Override
-    public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
+    public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
         super.paint(context, x, y, mouseX, mouseY);
-        if(cg.savedPalettesArea.editingPalette == this) context.drawBorder(x,y,this.width,this.height,0xFF00ff00);
-
-
+        if(cg.savedPalettesArea.editingPalette == this) {
+            context.fill(x,y,this.width,this.height,0xFF00ff00);
+        }
     }
-
 }

@@ -2,13 +2,14 @@ package com.bacco.gui;
 
 import io.github.cottonmc.cotton.gui.widget.WSprite;
 import io.github.cottonmc.cotton.gui.widget.data.InputResult;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class WTextureThumbnail extends WSprite {
 
-    int index = 0;
+    int index;
     BlockInfoGui bigui;
-    public WTextureThumbnail(Identifier image, float u1, float v1, float u2, float v2, int i, BlockInfoGui gui) {
+
+    public WTextureThumbnail(ResourceLocation image, float u1, float v1, float u2, float v2, int i, BlockInfoGui gui) {
         super(image, u1, v1, u2, v2);
         this.index = i;
         this.bigui = gui;

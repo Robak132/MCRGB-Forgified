@@ -10,17 +10,20 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.world.item.Items;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.ChatFormatting;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -31,72 +34,53 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Environment(EnvType.CLIENT)
 public class MCRGBClient implements ClientModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("mcrgb");
-    public static final boolean readMode = false;
-    static Type listType = new TypeToken<ArrayList<Palette>>() {
-    }.getType();
-    public net.minecraft.client.Minecraft client;
-    public ArrayList<Palette> palettes = new ArrayList<>();
+    public Minecraft client;
+    public List<Palette> palettes = new ArrayList<>();
     int totalBlocks = 0;
     int fails = 0;
     int successes = 0;
     boolean scanned = false;
 
     public static void writeJson(String str, String path, String fileName) throws IOException {
-        try {
-            File dir = new File(path);
-            File file = new File(dir, fileName);
+        File dir = new File(path);
+        File file = new File(dir, fileName);
+        try (FileWriter fw = new FileWriter(file)) {
             if (!dir.exists()) {
                 dir.mkdir();
             }
             if (!file.exists()) {
                 file.createNewFile();
             }
-            FileWriter fw = new FileWriter(file);
-
-            // read each character from string and write
-            // into FileWriter
-            for (int i = 0; i < str.length(); i++)
+            for (int i = 0; i < str.length(); i++) {
                 fw.write(str.charAt(i));
-
-
-            // close the file
-            fw.close();
+            }
         } catch (Exception e) {
             e.getStackTrace();
         }
     }
 
     public static String readJson(String path) {
-        try {
-            // FileReader Class used
-            FileReader fileReader = new FileReader(path);
-
+        try (FileReader fileReader = new FileReader(path)) {
             int i;
-            String str = "";
+            StringBuilder str = new StringBuilder();
             // Using read method
             while ((i = fileReader.read()) != -1) {
-                str += (char) i;
+                str.append((char) i);
             }
-
-            // Close method called
-            fileReader.close();
-            return str;
+            return str.toString();
         } catch (Exception e) {
             return "";
         }
     }
 
     //Calculate the dominant colours in a list of colours
-    public static Set<ColourGroup> GroupColours(ArrayList<ColourVector> rgblist) {
+    public static Set<ColourGroup> groupColours(List<ColourVector> rgblist) {
         Set<ColourGroup> groups = new HashSet<>();
 
         //Loop through every pixel
@@ -149,7 +133,7 @@ public class MCRGBClient implements ClientModInitializer {
                 counter++;
             }
             if (counter == 0) {
-                return null;
+                return Collections.emptySet();
             }
             ColourVector avg = sum.div(counter);
             group.meanColour = new ColourVector(avg.r, avg.g, avg.b);
@@ -164,8 +148,8 @@ public class MCRGBClient implements ClientModInitializer {
     public void onInitializeClient() {
         KeyInputHandler.register(this);
         MCRGBConfig.load();
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, _client) -> {
-            client = _client;
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            this.client = client;
             if (scanned) return;
             // Read from JSON
             try {
@@ -173,26 +157,24 @@ public class MCRGBClient implements ClientModInitializer {
                 ForgeRegistries.BLOCKS.forEach(block -> {
                     for (BlockColourStorage storage : loadedBlockColourArray) {
                         if (storage.block.equals(block.asItem().getDescriptionId())) {
-                            storage.spriteDetails.forEach(details -> {
-                                ((IItemBlockColourSaver) block.asItem()).addSpriteDetails(details);
-                            });
+                            storage.spriteDetails.forEach(details -> ((IItemBlockColourSaver) block.asItem()).addSpriteDetails(details));
                             break;
                         }
                     }
                 });
                 scanned = true;
             } catch (Exception e) {
-                RefreshColours();
+                refreshColours();
             }
         });
-        LoadPalettes();
+        loadPalettes();
         //Override item tooltips to display the colour.
         ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
             if (!MCRGBConfig.instance.alwaysShowToolTips) return;
             IItemBlockColourSaver item = (IItemBlockColourSaver) stack.getItem();
             for (int i = 0; i < item.getLength(); i++) {
-                ArrayList<String> strings = item.getSpriteDetails(i).getStrings();
-                ArrayList<Integer> colours = item.getSpriteDetails(i).getTextColours();
+                List<String> strings = item.getSpriteDetails(i).getStrings();
+                List<Integer> colours = item.getSpriteDetails(i).getTextColours();
                 if (!strings.isEmpty()) {
                     if (Screen.hasShiftDown()) {
                         for (int j = 0; j < strings.size(); j++) {
@@ -215,15 +197,14 @@ public class MCRGBClient implements ClientModInitializer {
                 }
             }
         });
-
     }
 
-    public void RefreshColours() {
+    public void refreshColours() {
         if (client == null) return;
         //get top sprite of stone block default state
-        var defSprite = client.getModelManager().getBlockModelShaper().getBlockModel(Blocks.STONE.getDefaultState()).getQuads(Blocks.STONE.getDefaultState(), Direction.UP, Random.create()).get(0).getSprite();
+        TextureAtlasSprite defSprite = client.getModelManager().getBlockModelShaper().getBlockModel(Blocks.STONE.defaultBlockState()).getQuads(Blocks.STONE.defaultBlockState(), Direction.UP, RandomSource.create()).get(0).getSprite();
         //get id of the atlas containing above
-        var atlas = defSprite.getAtlasId();
+        ResourceLocation atlas = defSprite.atlasLocation();
         //use atlas id to get OpenGL ID. Atlas contains ALL blocks
         int glID = client.getTextureManager().getTexture(atlas).getId();
         //get width and height from OpenGL by binding texture
@@ -237,18 +218,17 @@ public class MCRGBClient implements ClientModInitializer {
         //convert buffer to an array of bytes
         byte[] pixels = new byte[size * 4];
         buffer.get(pixels);
-        ArrayList<BlockColourStorage> blockColourList = new ArrayList<BlockColourStorage>();
+        List<BlockColourStorage> blockColourList = new ArrayList<>();
         //loop through every block in the game
         ForgeRegistries.BLOCKS.forEach(block -> {
-            if (block.asItem().getDescriptionId() == Items.AIR.getDescriptionId()) return;
+            if (block.asItem().getDescriptionId().equals(Items.AIR.getDescriptionId())) return;
             ((IItemBlockColourSaver) block.asItem()).clearSpriteDetails();
             BlockColourStorage storage = new BlockColourStorage();
             totalBlocks += 1;
-            Set<TextureAtlasSprite> sprites = new HashSet<TextureAtlasSprite>();
-
-            block.getStateManager().getStates().forEach(state -> {
+            Set<TextureAtlasSprite> sprites = new HashSet<>();
+            block.getStateDefinition().getPossibleStates().forEach(state -> {
                 try {
-                    var model = client.getModelManager().getModelBakery().getModel(state);
+                    BakedModel model = client.getModelManager().getBlockModelShaper().getBlockModel(state);
                     sprites.add(model.getQuads(state, Direction.UP, RandomSource.create()).get(0).getSprite());
                     sprites.add(model.getQuads(state, Direction.DOWN, RandomSource.create()).get(0).getSprite());
                     sprites.add(model.getQuads(state, Direction.NORTH, RandomSource.create()).get(0).getSprite());
@@ -258,27 +238,26 @@ public class MCRGBClient implements ClientModInitializer {
                     successes += 1;
                 } catch (Exception e) {
                     fails += 1;
-                    return;
                 }
             });
             if (sprites.isEmpty()) {
                 return;
             }
             sprites.forEach(sprite -> {
-                if (sprite.getContents().getId().getPath().equals("block/grass_block_side")) return;
+                if (sprite.contents().name().getPath().equals("block/grass_block_side")) return;
                 //get coords of sprite in atlas
                 int spriteX = sprite.getX();
                 int spriteY = sprite.getY();
-                int spriteW = sprite.getContents().getWidth();
-                int spriteH = sprite.getContents().getHeight();
+                int spriteW = sprite.contents().width();
+                int spriteH = sprite.contents().height();
                 //convert coords to byte position
                 int firstPixel = (spriteY * width + spriteX) * 4;
-                ArrayList<ColourVector> rgbList = new ArrayList<ColourVector>();
+                ArrayList<ColourVector> rgbList = new ArrayList<>();
                 int biomeColour = 0xFFFFFF;
                 try {
-                    biomeColour = client.getBlockColors().getColor(block.getDefaultState(), null, null, 0);
+                    biomeColour = client.getBlockColors().getColor(block.defaultBlockState(), null, null, 0);
                 } catch (Exception e) {
-                    LOGGER.warn("Could not find biome colour for block: " + block.getName() + ". Please report this logfile to https://github.com/bacco-bacco/MCRGB/issues");
+                    LOGGER.warn("Could not find biome colour for block: {}. Please report this logfile to https://github.com/bacco-bacco/MCRGB/issues", block.getName());
                 }
                 //for each horizontal row in the sprite
                 for (int row = 0; row < spriteH; row++) {
@@ -288,29 +267,26 @@ public class MCRGBClient implements ClientModInitializer {
                     for (int pos = firstInRow; pos < firstInRow + 4 * spriteW; pos += 4) {
                         //retrieve bytes for RGBA values
                         //"& 0xFF" does logical and with 11111111. this extracts the last 8 bits, converting to unsigned int
-                        int pixelColour = FastColor.Argb.getArgb(pixels[pos + 3], pixels[pos] & 0xFF, pixels[pos + 1] & 0xFF, pixels[pos + 2] & 0xFF);
-                        int alpha = FastColor.Argb.getAlpha(pixelColour);
-                        if (biomeColour != -1 & (!block.getDefaultState().isOf(Blocks.GRASS_BLOCK) || sprite.getContents().getId().getPath().equals("block/grass_block_top"))) {
-                            pixelColour = FastColor.Argb.mixColor(biomeColour, pixelColour);
+                        int pixelColour = FastColor.ABGR32.color(pixels[pos + 3], pixels[pos] & 0xFF, pixels[pos + 1] & 0xFF, pixels[pos + 2] & 0xFF);
+                        int alpha = FastColor.ABGR32.alpha(pixelColour);
+                        if (biomeColour != -1 && (!block.defaultBlockState().is(Blocks.GRASS_BLOCK) || sprite.contents().name().getPath().equals("block/grass_block_top"))) {
+                            pixelColour = FastColor.ARGB32.multiply(biomeColour, pixelColour);
                         }
                         //if the pixel is not fully transparent, add to the list
                         if (alpha > 0) {
-                            ColourVector c = new ColourVector(FastColor.Argb.getRed(pixelColour), FastColor.Argb.getGreen(pixelColour), FastColor.Argb.getBlue(pixelColour));
+                            ColourVector c = new ColourVector(FastColor.ABGR32.red(pixelColour), FastColor.ABGR32.green(pixelColour), FastColor.ABGR32.blue(pixelColour));
                             rgbList.add(c);
                         }
-
-
                     }
                 }
                 //Calculate the dominant colours
-                Set<ColourGroup> colourGroups = GroupColours(rgbList);
+                Set<ColourGroup> colourGroups = groupColours(rgbList);
                 if (colourGroups == null) return;
 
                 //Add sprite name and each dominant colour to the IItemBlockColourSaver
                 SpriteDetails spriteDetails = new SpriteDetails();
-                String[] namesplit = sprite.getContents().getId().toString().split("/");
-                String name = namesplit[namesplit.length - 1];
-                spriteDetails.name = name;
+                String[] namesplit = sprite.contents().name().toString().split("/");
+                spriteDetails.name = namesplit[namesplit.length - 1];
                 colourGroups.forEach(cg -> {
                     spriteDetails.colourinfo.add(cg.meanColour);
                     spriteDetails.weights.add(cg.weight);
@@ -318,9 +294,7 @@ public class MCRGBClient implements ClientModInitializer {
                 storage.block = block.asItem().getDescriptionId();
                 storage.spriteDetails.add(spriteDetails);
             });
-            storage.spriteDetails.forEach(details -> {
-                ((IItemBlockColourSaver) block.asItem()).addSpriteDetails(details);
-            });
+            storage.spriteDetails.forEach(details -> ((IItemBlockColourSaver) block.asItem()).addSpriteDetails(details));
             blockColourList.add(storage);
         });
 
@@ -329,29 +303,32 @@ public class MCRGBClient implements ClientModInitializer {
         String blockColoursJson = gson.toJson(blockColourList);
         try {
             writeJson(blockColoursJson, "./mcrgb_colours/", "file.json");
-        } catch (IOException e) {
+        } catch (IOException ignored) {
+            // Ignored
         }
-        client.player.sendMessage(Component.translatable("message.mcrgb.reloaded"), false);
+        client.player.displayClientMessage(Component.translatable("message.mcrgb.reloaded"), false);
     }
 
-    public void SavePalettes() {
+    public void savePalettes() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String blockColoursJson = gson.toJson(palettes);
         try {
             writeJson(blockColoursJson, "./mcrgb_colours/", "palettes.json");
-        } catch (IOException e) {
+        } catch (IOException ignore) {
+            // Ignored
         }
     }
 
-    public void LoadPalettes() {
-        ArrayList<Palette> loadedPalettes = new ArrayList<Palette>();
+    public void loadPalettes() {
+        List<Palette> loadedPalettes;
+        TypeToken<List<Palette>> t = new TypeToken<>() {};
         try {
-            loadedPalettes = new Gson().fromJson(readJson("./mcrgb_colours/palettes.json"), listType);
+            loadedPalettes = new Gson().fromJson(readJson("./mcrgb_colours/palettes.json"), t.getType());
         } catch (Exception e) {
-            loadedPalettes = new ArrayList<Palette>();
+            loadedPalettes = new ArrayList<>();
         }
         if (loadedPalettes == null) {
-            loadedPalettes = new ArrayList<Palette>();
+            loadedPalettes = new ArrayList<>();
         }
 
         palettes = loadedPalettes;

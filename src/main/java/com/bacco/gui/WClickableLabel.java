@@ -6,10 +6,10 @@ import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.data.InputResult;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.MutableComponent;
-import net.minecraft.text.Style;
-import net.minecraft.text.Component;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 
 import java.util.List;
 
@@ -23,7 +23,8 @@ public class WClickableLabel extends WLabel {
 
     Component textUnhovered = text;
 
-    MutableComponent textHovered = (MutableComponent) Component.empty();
+    MutableComponent textHovered = Component.empty();
+
     public WClickableLabel(Component text, ColourVector colour, MCRGBBaseGui gui) {
         super(text);
         this.colour = colour;
@@ -32,33 +33,31 @@ public class WClickableLabel extends WLabel {
         this.gui = gui;
 
 
-        List<Component> components = text.getWithStyle(Style.EMPTY.withItalic(true).withUnderline(true));
-        List<Component> componentsBase = text.getWithStyle(Style.EMPTY);
-        if(components.size()>0)
+        List<Component> components = text.toFlatList(Style.EMPTY.withItalic(true).withUnderlined(true));
+        List<Component> componentsBase = text.toFlatList(Style.EMPTY);
+        if (!components.isEmpty()) {
             components.removeFirst();
-            components.addFirst(componentsBase.getFirst());
-
-        for (Component component : components){
-                textHovered.append(component);
         }
-
+        components.addFirst(componentsBase.getFirst());
+        for (Component component : components) {
+            textHovered.append(component);
+        }
     }
 
     @Override
     public InputResult onClick(int x, int y, int button) {
-        gui.SetColour(colour);
-        //client.setScreen(new ColourScreen(gui));
+        gui.setColour(colour);
         return super.onClick(x, y, button);
     }
 
 
     @Environment(EnvType.CLIENT)
     @Override
-    public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
-        super.paint(context,x,y,mouseX,mouseY);
-        if(isWithinBounds(mouseX, mouseY)){
+    public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
+        super.paint(context, x, y, mouseX, mouseY);
+        if (isWithinBounds(mouseX, mouseY)) {
             setText(textHovered);
-        }else{
+        } else {
             setText(textUnhovered);
         }
 

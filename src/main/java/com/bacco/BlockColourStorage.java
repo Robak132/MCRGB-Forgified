@@ -1,8 +1,9 @@
 package com.bacco;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BlockColourStorage {
     public String block;
-    public ArrayList<SpriteDetails> spriteDetails = new ArrayList<>();
+    public List<SpriteDetails> spriteDetails = new ArrayList<>();
 }

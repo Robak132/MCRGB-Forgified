@@ -22,7 +22,8 @@ public final class MCRGBConfig {
         String blockColoursJson = gson.toJson(instance);
         try {
             writeJson(blockColoursJson, "./config/mcrgb/", "config.json");
-        } catch (IOException e) {
+        } catch (IOException ignored) {
+            // Ignored
         }
     }
 
