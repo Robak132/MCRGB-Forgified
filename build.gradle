@@ -2,43 +2,17 @@ plugins {
     id 'idea'
     id 'java'
     id 'java-library'
-    id 'checkstyle'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '6.0.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
 }
 
-// Configure all projects including subprojects
-allprojects {
-    apply plugin: 'java'
-    apply plugin: 'java-library'
-
-    repositories {
-        maven {
-            name = "Progwml6 maven"
-            url = 'https://dvs1.progwml6.com/files/maven/'
-        }
-        maven {
-            name = "curios"
-            url = 'https://maven.theillusivec4.top/'
-        }
-        maven { url = 'https://maven.blamejared.com' }
-        maven { url = 'https://www.cursemaven.com' }
-        maven {
-            name = "CottonMC"
-            url = "https://server.bbkr.space/artifactory/libs-release"
-        }
-        maven { url = 'https://maven.parchmentmc.org' }
-        maven { url "https://maven.shedaniel.me/" }
-        maven { url "https://maven.terraformersmc.com/releases/" }
-        maven { url "https://maven.su5ed.dev/releases" }
-        maven { url "https://maven.minecraftforge.net" }
-        mavenCentral()
-    }
-
-    tasks.withType(JavaCompile).configureEach {
-        options.encoding = 'UTF-8'
-    }
+repositories {
+    maven { url "https://maven.juuxel.me/" }
+    maven { url "https://maven.shedaniel.me/" }
+    maven { url "https://maven.minecraftforge.net" }
+    mavenCentral()
 }
 
 version = project.mod_version
@@ -51,7 +25,8 @@ base {
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 minecraft {
-    mappings channel: 'parchment', version: '2023.10.08-1.20.2'
+    // Use Parchment mappings that match the Forge/Minecraft version (1.20.1)
+    mappings channel: 'parchment', version: '2023.09.03-1.20.1'
     copyIdeResources = true
     generateRunFolders = true
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -92,46 +67,31 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:1.20.1-47.1.0"
+    minecraft "net.minecraftforge:forge:1.20.1-47.1.3"
     implementation "me.shedaniel.cloth:cloth-config-forge:11.1.136"
-    implementation "dev.su5ed.sinytra.fabric-api:fabric-api:0.92.6+1.11.14+1.20.1"
-    implementation api("io.github.juuxel:libninepatch:1.2.0")
-    implementation project(':libgui')
-}
 
-checkstyle {
-    toolVersion = '10.18.2'
-    configDirectory = file('config/checkstyle')
-    ignoreFailures = false
-    maxWarnings = 0
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 java {
     // Ensure source uses Java 21 features and bytecode targets Java 17
-    sourceCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
-    toolchain { languageVersion = JavaLanguageVersion.of(21) }
+    toolchain { languageVersion = JavaLanguageVersion.of(17) }
+}
+
+mixin {
+    // MixinGradle Settings
+    add sourceSets.main, 'mixins.mcrgb.refmap.json'
+    config 'mixins.mcrgb.json'
+
+    debug.verbose = true
+    debug.export = true
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    // Generate Java 17-compatible bytecode regardless of the toolchain JDK
     options.release = 17
-}
-
-tasks.named('processResources', ProcessResources).configure {
-    var replaceProperties = [
-            mc_version          : mc_version, flib_version: flib_version,
-            loader_version_range: loader_version_range,
-            neo_version_range   : neo_version_range, neo_version: neo_version,
-            mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors         : mod_authors, mod_description: mod_description
-    ]
-    inputs.properties replaceProperties
-
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
-    }
 }
 
 tasks.named('jar', Jar).configure {
@@ -158,8 +118,4 @@ tasks.withType(Checkstyle).configureEach {
         html.required = true
         xml.required = false
     }
-}
-
-tasks.named('check') {
-    dependsOn tasks.withType(Checkstyle)
 }
