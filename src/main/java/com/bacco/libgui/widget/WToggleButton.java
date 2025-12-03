@@ -1,8 +1,8 @@
 package com.bacco.libgui.widget;
 
-import com.bacco.libgui.LibGuiCommon;
-import com.bacco.libgui.ScreenDrawing;
-import com.bacco.libgui.NarrationMessages;
+import com.bacco.libgui.client.LibGuiCommon;
+import com.bacco.libgui.client.ScreenDrawing;
+import com.bacco.libgui.client.NarrationMessages;
 import com.bacco.libgui.widget.data.InputResult;
 import com.bacco.libgui.widget.data.Texture;
 import net.minecraft.client.Minecraft;
@@ -109,7 +109,7 @@ public class WToggleButton extends WWidget {
         }
 
         if (label != null) {
-            ScreenDrawing.drawString(context, label.getVisualOrderText(), x + 22, y + 6, shouldRenderInDarkMode() ? darkmodeColor : color);
+            ScreenDrawing.drawString(context, label.getVisualOrderText(), x + 22, y + 6, false ? darkmodeColor : color);
         }
     }
 

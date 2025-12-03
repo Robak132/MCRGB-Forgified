@@ -1,5 +1,6 @@
-package com.bacco.libgui;
+package com.bacco.libgui.client;
 
+import com.bacco.libgui.*;
 import com.bacco.libgui.widget.WPanel;
 import com.bacco.libgui.widget.WWidget;
 import com.bacco.libgui.widget.data.InputResult;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 public class CottonClientScreen extends Screen implements CottonScreenImpl {
-    private static final VisualLogger LOGGER = new VisualLogger(CottonInventoryScreen.class);
+    private static final VisualLogger LOGGER = new VisualLogger(CottonClientScreen.class);
     private final MouseInputHandler<CottonClientScreen> mouseInputHandler = new MouseInputHandler<>(this);
     protected GuiDescription description;
     protected int left = 0;

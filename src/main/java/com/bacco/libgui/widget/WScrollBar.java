@@ -1,10 +1,10 @@
 package com.bacco.libgui.widget;
 
-import com.bacco.libgui.LibGuiCommon;
+import com.bacco.libgui.client.LibGuiCommon;
 import com.bacco.libninepatch.NinePatch;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.bacco.libgui.BackgroundPainter;
-import com.bacco.libgui.NarrationMessages;
+import com.bacco.libgui.client.BackgroundPainter;
+import com.bacco.libgui.client.NarrationMessages;
 import com.bacco.libninepatch.NinePatchTextureRendererImpl;
 import com.bacco.libgui.widget.data.CottonAxis;
 import com.bacco.libgui.widget.data.InputResult;
@@ -13,7 +13,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.resources.ResourceLocation;
 
-import static com.bacco.libgui.BackgroundPainter.createNinePatch;
+import static com.bacco.libgui.client.BackgroundPainter.createNinePatch;
 
 public class WScrollBar extends WWidget {
     private static final int SCROLLING_SPEED = 4;
@@ -45,7 +45,7 @@ public class WScrollBar extends WWidget {
         @Override
     public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
         PoseStack matrices = context.pose();
-        boolean darkMode = shouldRenderInDarkMode();
+            boolean darkMode = false;
 
         Painters.BACKGROUND.paintBackground(context, x, y, this);
 
@@ -155,16 +155,14 @@ public class WScrollBar extends WWidget {
 
     @Override
     public InputResult onMouseDown(int x, int y, int button) {
-        //TODO: Clicking before or after the handle should jump instead of scrolling
         requestFocus();
 
         if (axis == CottonAxis.HORIZONTAL) {
             anchor = x;
-            anchorValue = value;
         } else {
             anchor = y;
-            anchorValue = value;
         }
+        anchorValue = value;
         sliding = true;
         return InputResult.PROCESSED;
     }

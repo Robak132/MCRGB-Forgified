@@ -1,12 +1,11 @@
 package com.bacco.mcrrgb.event;
 
 import com.bacco.libgui.widget.data.ColourVector;
+import com.bacco.mcrrgb.gui.ColourGui;
+import com.bacco.mcrrgb.gui.ColourScreen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
-
-import com.bacco.libgui.gui.ColourGui;
-import com.bacco.libgui.gui.ColourScreen;
 
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

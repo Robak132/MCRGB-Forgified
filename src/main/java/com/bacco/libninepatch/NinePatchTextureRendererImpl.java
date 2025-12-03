@@ -1,7 +1,7 @@
 package com.bacco.libninepatch;
 
-import com.bacco.libgui.LibGuiShaders;
-import com.bacco.libgui.ScreenDrawing;
+import com.bacco.libgui.client.LibGuiShaders;
+import com.bacco.libgui.client.ScreenDrawing;
 import com.mojang.blaze3d.pipeline.RenderCall;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;

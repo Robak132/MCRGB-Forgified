@@ -1,7 +1,6 @@
 package com.bacco.mcrrgb.gui;
 
-import com.bacco.libgui.ScreenDrawing;
-import com.bacco.libgui.gui.MCRGBBaseGui;
+import com.bacco.libgui.client.ScreenDrawing;
 import com.bacco.libgui.widget.data.InputResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

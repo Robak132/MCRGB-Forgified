@@ -43,46 +43,6 @@ public class WScrollPanel extends WClippedPanel {
         children.add(verticalScrollBar); // Only vertical scroll bar
     }
 
-    /**
-     * Returns whether this scroll panel has a horizontal scroll bar.
-     *
-     * @return TriState.TRUE if there is a horizontal scroll bar,
-     * default if a scroll bar should be added if needed,
-     * and false otherwise
-     */
-    public TriState isScrollingHorizontally() {
-        return scrollingHorizontally;
-    }
-
-    public WScrollPanel setScrollingHorizontally(TriState scrollingHorizontally) {
-        if (scrollingHorizontally != this.scrollingHorizontally) {
-            this.scrollingHorizontally = scrollingHorizontally;
-            layout();
-        }
-
-        return this;
-    }
-
-    /**
-     * Returns whether this scroll panel has a vertical scroll bar.
-     *
-     * @return true if there is a vertical scroll bar,
-     * *         default if a scroll bar should be added if needed,
-     * *         and false otherwise
-     */
-    public TriState isScrollingVertically() {
-        return scrollingVertically;
-    }
-
-    public WScrollPanel setScrollingVertically(TriState scrollingVertically) {
-        if (scrollingVertically != this.scrollingVertically) {
-            this.scrollingVertically = scrollingVertically;
-            layout();
-        }
-
-        return this;
-    }
-
     @Override
     public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
         if (verticalScrollBar.getValue() != lastVerticalScroll || horizontalScrollBar.getValue() != lastHorizontalScroll) {

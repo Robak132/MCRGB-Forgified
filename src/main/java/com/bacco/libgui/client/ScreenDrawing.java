@@ -1,4 +1,4 @@
-package com.bacco.libgui;
+package com.bacco.libgui.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -146,43 +146,6 @@ public class ScreenDrawing {
     }
 
     /**
-     * Draws a textured rectangle with UV values based on the width and height.
-     *
-     * <p>If the texture is 256x256, this draws the texture at one pixel per texel.
-     *
-     * @param context  the draw context
-     * @param x        the x coordinate of the box on-screen
-     * @param y        the y coordinate of the box on-screen
-     * @param width    the width of the box on-screen
-     * @param height   the height of the box on-screen
-     * @param texture  the Identifier for the texture
-     * @param textureX the x offset into the texture
-     * @param textureY the y offset into the texture
-     * @param color    a color to tint the texture. This can be transparent! Use 0xFF_FFFFFF if you don't want a color tint
-     */
-    public static void texturedGuiRect(GuiGraphics context, int x, int y, int width, int height, ResourceLocation texture, int textureX, int textureY, int color) {
-        float px = 1 / 256f;
-        texturedRect(context, x, y, width, height, texture, textureX * px, textureY * px, (textureX + width) * px, (textureY + height) * px, color);
-    }
-
-    /**
-     * Draws a textured rectangle with UV values based on the width and height.
-     *
-     * <p>If the texture is 256x256, this draws the texture at one pixel per texel.
-     *
-     * @param context the draw context
-     * @param left    the x coordinate of the box on-screen
-     * @param top     the y coordinate of the box on-screen
-     * @param width   the width of the box on-screen
-     * @param height  the height of the box on-screen
-     * @param texture the Identifier for the texture
-     * @param color   a color to tint the texture. This can be transparent! Use 0xFF_FFFFFF if you don't want a color tint
-     */
-    public static void texturedGuiRect(GuiGraphics context, int left, int top, int width, int height, ResourceLocation texture, int color) {
-        texturedGuiRect(context, left, top, width, height, texture, 0, 0, color);
-    }
-
-    /**
      * Draws an untextured rectangle of the specified RGB color.
      */
     public static void coloredRect(GuiGraphics context, int left, int top, int width, int height, int color) {
@@ -190,21 +153,6 @@ public class ScreenDrawing {
         if (height <= 0) height = 1;
 
         context.fill(left, top, left + width, top + height, color);
-    }
-
-    /**
-     * Draws a beveled, round rectangle that is substantially similar to default Minecraft UI panels.
-     *
-     * @param context the draw context
-     * @param x       the X position of the panel
-     * @param y       the Y position of the panel
-     * @param width   the width of the panel
-     * @param height  the height of the panel
-     */
-    public static void drawGuiPanel(GuiGraphics context, int x, int y, int width, int height) {
-        if (false)
-            drawGuiPanel(context, x, y, width, height, 0xFF0B0B0B, 0xFF2F2F2F, 0xFF414141, 0xFF000000);
-        else drawGuiPanel(context, x, y, width, height, 0xFF555555, 0xFFC6C6C6, 0xFFFFFFFF, 0xFF000000);
     }
 
     /**
@@ -260,20 +208,6 @@ public class ScreenDrawing {
     }
 
     /**
-     * Draws a default-sized recessed itemslot panel
-     */
-    public static void drawBeveledPanel(GuiGraphics context, int x, int y) {
-        drawBeveledPanel(context, x, y, 18, 18, 0xFF373737, 0xFF8b8b8b, 0xFFFFFFFF);
-    }
-
-    /**
-     * Draws a default-color recessed itemslot panel of variable size
-     */
-    public static void drawBeveledPanel(GuiGraphics context, int x, int y, int width, int height) {
-        drawBeveledPanel(context, x, y, width, height, 0xFF373737, 0xFF8b8b8b, 0xFFFFFFFF);
-    }
-
-    /**
      * Draws a generalized-case beveled panel. Can be inset or outset depending on arguments.
      *
      * @param context     the draw context
@@ -291,36 +225,6 @@ public class ScreenDrawing {
         coloredRect(context, x, y + 1, 1, height - 2, topleft); //Left shadow
         coloredRect(context, x + width - 1, y + 1, 1, height - 1, bottomright); //Right hilight
         coloredRect(context, x + 1, y + height - 1, width - 1, 1, bottomright); //Bottom hilight
-    }
-
-    /**
-     * Draws a string with a custom alignment.
-     *
-     * @param context the draw context
-     * @param s       the string
-     * @param align   the alignment of the string
-     * @param x       the X position
-     * @param y       the Y position
-     * @param width   the width of the string, used for aligning
-     * @param color   the text color
-     */
-    public static void drawString(GuiGraphics context, String s, HorizontalAlignment align, int x, int y, int width, int color) {
-        Font textRenderer = Minecraft.getInstance().font;
-        switch (align) {
-            case LEFT -> context.drawString(textRenderer, s, x, y, color, false);
-
-            case CENTER -> {
-                int wid = textRenderer.width(s);
-                int l = (width / 2) - (wid / 2);
-                context.drawString(textRenderer, s, x + l, y, color, false);
-            }
-
-            case RIGHT -> {
-                int wid = textRenderer.width(s);
-                int l = width - wid;
-                context.drawString(textRenderer, s, x + l, y, color, false);
-            }
-        }
     }
 
     /**
@@ -350,36 +254,6 @@ public class ScreenDrawing {
                 int wid = textRenderer.width(text);
                 int l = width - wid;
                 context.drawString(textRenderer, text, x + l, y, color, false);
-            }
-        }
-    }
-
-    /**
-     * Draws a shadowed string.
-     *
-     * @param context the draw context
-     * @param s       the string
-     * @param align   the alignment of the string
-     * @param x       the X position
-     * @param y       the Y position
-     * @param width   the width of the string, used for aligning
-     * @param color   the text color
-     */
-    public static void drawStringWithShadow(GuiGraphics context, String s, HorizontalAlignment align, int x, int y, int width, int color) {
-        var textRenderer = Minecraft.getInstance().font;
-        switch (align) {
-            case LEFT -> context.drawString(textRenderer, s, x, y, color, true);
-
-            case CENTER -> {
-                int wid = textRenderer.width(s);
-                int l = (width / 2) - (wid / 2);
-                context.drawString(textRenderer, s, x + l, y, color, true);
-            }
-
-            case RIGHT -> {
-                int wid = textRenderer.width(s);
-                int l = width - wid;
-                context.drawString(textRenderer, s, x + l, y, color, true);
             }
         }
     }
@@ -415,19 +289,6 @@ public class ScreenDrawing {
     }
 
     /**
-     * Draws a left-aligned string.
-     *
-     * @param context the draw context
-     * @param s       the string
-     * @param x       the X position
-     * @param y       the Y position
-     * @param color   the text color
-     */
-    public static void drawString(GuiGraphics context, String s, int x, int y, int color) {
-        context.drawString(Minecraft.getInstance().font, s, x, y, color, false);
-    }
-
-    /**
      * Draws a left-aligned text component.
      *
      * @param context the draw context
@@ -454,15 +315,6 @@ public class ScreenDrawing {
      */
     public static void drawTextHover(GuiGraphics context, @Nullable Style textStyle, int x, int y) {
         context.renderComponentHoverEffect(Minecraft.getInstance().font, textStyle, x, y);
-    }
-
-    public static int colorAtOpacity(int opaque, float opacity) {
-        if (opacity < 0.0f) opacity = 0.0f;
-        if (opacity > 1.0f) opacity = 1.0f;
-
-        int a = (int) (opacity * 255.0f);
-
-        return (opaque & 0xFFFFFF) | (a << 24);
     }
 
     public static int multiplyColor(int color, float amount) {

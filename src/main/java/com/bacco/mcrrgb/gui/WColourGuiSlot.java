@@ -1,12 +1,11 @@
 package com.bacco.mcrrgb.gui;
 
-import com.bacco.libgui.LibGuiCommon;
+import com.bacco.libgui.client.LibGuiCommon;
 import com.bacco.libgui.widget.TooltipBuilder;
 import com.bacco.libgui.widget.WWidget;
 import com.bacco.mcrrgb.IItemBlockColourSaver;
 import com.bacco.mcrrgb.MCRGBConfig;
-import com.bacco.libgui.ScreenDrawing;
-import com.bacco.libgui.gui.ColourGui;
+import com.bacco.libgui.client.ScreenDrawing;
 import com.bacco.libgui.widget.data.InputResult;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;

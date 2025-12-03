@@ -1,4 +1,4 @@
-package com.bacco.libgui.gui;
+package com.bacco.mcrrgb.gui;
 
 import com.bacco.libgui.widget.*;
 import com.bacco.libgui.widget.data.ColourVector;
@@ -8,10 +8,6 @@ import com.bacco.libgui.widget.data.CottonAxis;
 import com.bacco.libgui.widget.data.HorizontalAlignment;
 import com.bacco.libgui.widget.data.Insets;
 import com.bacco.libgui.widget.icon.TextureIcon;
-import com.bacco.mcrrgb.gui.WBlockInfoBox;
-import com.bacco.mcrrgb.gui.WPickableTexture;
-import com.bacco.mcrrgb.gui.WSavedPalettesArea;
-import com.bacco.mcrrgb.gui.WTextureThumbnail;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;

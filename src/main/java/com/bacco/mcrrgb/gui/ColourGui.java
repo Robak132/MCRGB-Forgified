@@ -1,4 +1,4 @@
-package com.bacco.libgui.gui;
+package com.bacco.mcrrgb.gui;
 
 import com.bacco.libgui.widget.*;
 import com.bacco.libgui.widget.data.*;

@@ -1,6 +1,6 @@
-package com.bacco.libgui.gui;
+package com.bacco.mcrrgb.gui;
 
-import com.bacco.libgui.LightweightGuiDescription;
+import com.bacco.libgui.client.LightweightGuiDescription;
 import com.bacco.libgui.widget.data.ColourVector;
 import com.bacco.mcrrgb.MCRGBClient;
 import com.bacco.libgui.widget.WGridPanel;

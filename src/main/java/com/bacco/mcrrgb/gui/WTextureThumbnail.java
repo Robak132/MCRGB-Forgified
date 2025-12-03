@@ -1,6 +1,5 @@
 package com.bacco.mcrrgb.gui;
 
-import com.bacco.libgui.gui.BlockInfoGui;
 import com.bacco.libgui.widget.WSprite;
 import com.bacco.libgui.widget.data.InputResult;
 import net.minecraft.resources.ResourceLocation;

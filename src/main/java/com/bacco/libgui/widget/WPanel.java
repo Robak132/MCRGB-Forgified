@@ -1,7 +1,7 @@
 package com.bacco.libgui.widget;
 
 import com.bacco.libgui.GuiDescription;
-import com.bacco.libgui.BackgroundPainter;
+import com.bacco.libgui.client.BackgroundPainter;
 import com.bacco.libgui.widget.data.Insets;
 import net.minecraft.client.gui.GuiGraphics;
 

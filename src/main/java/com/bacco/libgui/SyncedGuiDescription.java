@@ -1,11 +1,10 @@
 package com.bacco.libgui;
 
-import com.bacco.libgui.networking.NetworkSide;
+import com.bacco.libgui.client.BackgroundPainter;
 import com.bacco.libgui.widget.*;
 import com.bacco.libgui.widget.data.HorizontalAlignment;
 import com.bacco.libgui.widget.data.Insets;
 import com.bacco.libgui.widget.data.Vec2i;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.WorldlyContainerHolder;
@@ -523,32 +522,4 @@ public class SyncedGuiDescription extends AbstractContainerMenu implements GuiDe
         this.titlePos = titlePos;
     }
 
-    /**
-     * Gets the network side this GUI description runs on.
-     *
-     * @return this GUI's network side
-     * @since 3.3.0
-     */
-    public final NetworkSide getNetworkSide() {
-        return world instanceof ServerLevel ? NetworkSide.SERVER : NetworkSide.CLIENT;
-    }
-
-    /**
-     * Gets the packet sender corresponding to this GUI's network side.
-     *
-     * Note: Networking removed for Forge migration - returns null
-     *
-     * @return null (packet sender not implemented for Forge)
-     * @since 3.3.0
-     */
-    public final Object getPacketSender() {
-        // Removed Fabric ServerPlayNetworking/ClientPlayNetworking
-        // If networking is needed, implement using Forge's networking system
-        return null;
-    }
-
-    private Object getClientPacketSender() {
-        // Removed ClientPlayNetworking
-        return null;
-    }
 }

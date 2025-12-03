@@ -1,5 +1,6 @@
-package com.bacco.libgui;
+package com.bacco.libgui.client;
 
+import com.bacco.libgui.GuiDescription;
 import com.bacco.libgui.widget.WItemSlot;
 import com.bacco.libgui.widget.WWidget;
 import com.bacco.libgui.widget.data.Texture;
@@ -82,23 +83,6 @@ public interface BackgroundPainter {
     }
 
     /**
-     * Creates a colorful gui panel painter that has a custom contrast between the shadows and highlights.
-     *
-     * @param panelColor the panel background color
-     * @param contrast   the contrast between the shadows and highlights
-     * @return a colorful gui panel painter
-     */
-    static BackgroundPainter createColorful(int panelColor, float contrast) {
-        return (context, left, top, panel) -> {
-            int shadowColor = ScreenDrawing.multiplyColor(panelColor, 1.0f - contrast);
-            int hilightColor = ScreenDrawing.multiplyColor(panelColor, 1.0f + contrast);
-
-            ScreenDrawing.drawGuiPanel(context, left, top, panel.getWidth(), panel.getHeight(), shadowColor, panelColor,
-                hilightColor, 0xFF000000);
-        };
-    }
-
-    /**
      * Creates a new nine-patch background painter.
      *
      * <p>The resulting painter has a corner size of 4 px and a corner UV of 0.25.
@@ -134,7 +118,6 @@ public interface BackgroundPainter {
 
     /**
      * Creates a background painter that uses either the {@code light} or the {@code dark} background painter
-     * depending on the {@linkplain WWidget#shouldRenderInDarkMode current setting}.
      *
      * @param light the light mode background painter
      * @param dark  the dark mode background painter
@@ -142,13 +125,7 @@ public interface BackgroundPainter {
      * @since 1.5.0
      */
     static BackgroundPainter createLightDarkVariants(BackgroundPainter light, BackgroundPainter dark) {
-        return (context, left, top, panel) -> {
-            if (panel.shouldRenderInDarkMode()) {
-                dark.paintBackground(context, left, top, panel);
-            } else {
-                light.paintBackground(context, left, top, panel);
-            }
-        };
+        return light;
     }
 
     /**

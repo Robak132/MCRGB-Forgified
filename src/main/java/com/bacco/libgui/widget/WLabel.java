@@ -1,6 +1,6 @@
 package com.bacco.libgui.widget;
 
-import com.bacco.libgui.ScreenDrawing;
+import com.bacco.libgui.client.ScreenDrawing;
 import com.bacco.libgui.widget.data.HorizontalAlignment;
 import com.bacco.libgui.widget.data.InputResult;
 import com.bacco.libgui.widget.data.VerticalAlignment;
@@ -61,7 +61,7 @@ public class WLabel extends WWidget {
             case TOP -> 0;
         };
 
-        ScreenDrawing.drawString(context, text.getVisualOrderText(), horizontalAlignment, x, y + yOffset, this.getWidth(), shouldRenderInDarkMode() ? darkmodeColor : color);
+            ScreenDrawing.drawString(context, text.getVisualOrderText(), horizontalAlignment, x, y + yOffset, this.getWidth(), false ? darkmodeColor : color);
 
         Style hoveredTextStyle = getTextStyleAt(mouseX, mouseY);
         ScreenDrawing.drawTextHover(context, hoveredTextStyle, x + mouseX, y + mouseY);

@@ -47,7 +47,7 @@ public class MCRGBClient {
     static int successes = 0;
     static volatile boolean scanned = false;
 
-    public static void writeJson(String str, String path, String fileName) throws IOException {
+    public static void writeJson(String str, String path, String fileName) {
         File dir = new File(path);
         File file = new File(dir, fileName);
         try (FileWriter fw = new FileWriter(file)) {
@@ -295,22 +295,14 @@ public class MCRGBClient {
         //Write arraylist to json
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String blockColoursJson = gson.toJson(blockColourList);
-        try {
-            writeJson(blockColoursJson, "./mcrgb_colours/", "file.json");
-        } catch (IOException ignored) {
-            // Ignored
-        }
+        writeJson(blockColoursJson, "./mcrgb_colours/", "file.json");
         client.player.displayClientMessage(Component.translatable("message.mcrgb.reloaded"), false);
     }
 
     public static void savePalettes() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String blockColoursJson = gson.toJson(palettes);
-        try {
-            writeJson(blockColoursJson, "./mcrgb_colours/", "palettes.json");
-        } catch (IOException ignore) {
-            // Ignored
-        }
+        writeJson(blockColoursJson, "./mcrgb_colours/", "palettes.json");
     }
 
     public static void loadPalettes() {

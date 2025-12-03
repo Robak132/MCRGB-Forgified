@@ -2,8 +2,6 @@ package com.bacco.mcrrgb;
 
 import com.google.gson.Gson;
 
-import java.io.IOException;
-
 import static com.bacco.mcrrgb.MCRGBClient.readJson;
 import static com.bacco.mcrrgb.MCRGBClient.writeJson;
 
@@ -12,19 +10,13 @@ public final class MCRGBConfig {
     public static MCRGBConfig instance = new MCRGBConfig();
     public boolean alwaysShowToolTips = false;
     public boolean sliderConstantUpdate = true;
-
-    public String command = "give %p %i%c %q";
-
     public boolean bypassOP = false;
+    public String command = "give %p %i%c %q";
 
     public static void save(){
         Gson gson = new Gson();
         String blockColoursJson = gson.toJson(instance);
-        try {
-            writeJson(blockColoursJson, "./config/mcrgb/", "config.json");
-        } catch (IOException ignored) {
-            // Ignored
-        }
+        writeJson(blockColoursJson, "./config/mcrgb/", "config.json");
     }
 
     public static void load(){

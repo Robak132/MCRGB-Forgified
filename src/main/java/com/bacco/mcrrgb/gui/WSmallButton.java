@@ -1,6 +1,6 @@
 package com.bacco.mcrrgb.gui;
 
-import com.bacco.libgui.ScreenDrawing;
+import com.bacco.libgui.client.ScreenDrawing;
 import com.bacco.libgui.widget.WButton;
 import com.bacco.libgui.widget.data.HorizontalAlignment;
 import com.bacco.libgui.widget.icon.Icon;

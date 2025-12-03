@@ -1,6 +1,6 @@
 package com.bacco.libgui.widget;
 
-import com.bacco.libgui.ScreenDrawing;
+import com.bacco.libgui.client.ScreenDrawing;
 import com.bacco.libgui.widget.data.Texture;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;

@@ -1,6 +1,9 @@
 package com.bacco.libgui.widget;
 
 import com.bacco.libgui.*;
+import com.bacco.libgui.client.BackgroundPainter;
+import com.bacco.libgui.client.LibGuiCommon;
+import com.bacco.libgui.client.NarrationMessages;
 import com.bacco.libgui.widget.data.InputResult;
 import com.bacco.libgui.widget.data.Rect2i;
 import com.bacco.libgui.widget.focus.Focus;

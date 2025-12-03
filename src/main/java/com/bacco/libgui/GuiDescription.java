@@ -1,6 +1,7 @@
 package com.bacco.libgui;
 
 
+import com.bacco.libgui.client.LightweightGuiDescription;
 import com.bacco.libgui.widget.ValidatedSlot;
 import com.bacco.libgui.widget.WLabel;
 import com.bacco.libgui.widget.WPanel;

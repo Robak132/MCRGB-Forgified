@@ -2,9 +2,9 @@ package com.bacco.mcrrgb.gui;
 
 import com.bacco.libgui.widget.WLabel;
 import com.bacco.mcrrgb.MCRGBClient;
-import com.bacco.libgui.gui.MCRGBBaseGui;
 import com.bacco.libgui.widget.data.ColourVector;
 import com.bacco.libgui.widget.data.InputResult;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -17,7 +17,7 @@ public class WClickableLabel extends WLabel {
     ColourVector colour;
     MCRGBBaseGui gui;
 
-    net.minecraft.client.Minecraft client;
+    Minecraft client;
     MCRGBClient mcrgbClient;
 
     Component textUnhovered = text;

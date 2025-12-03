@@ -2,8 +2,7 @@ package com.bacco.mcrrgb.gui;
 
 import com.bacco.libgui.widget.WBox;
 import com.bacco.mcrrgb.IItemBlockColourSaver;
-import com.bacco.libgui.BackgroundPainter;
-import com.bacco.libgui.gui.MCRGBBaseGui;
+import com.bacco.libgui.client.BackgroundPainter;
 import com.bacco.libgui.widget.data.ColourVector;
 import com.bacco.libgui.widget.data.CottonAxis;
 import com.bacco.libgui.widget.data.Insets;

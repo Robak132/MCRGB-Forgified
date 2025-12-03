@@ -1,8 +1,8 @@
 package com.bacco.libgui.widget;
 
-import com.bacco.libgui.BackgroundPainter;
-import com.bacco.libgui.LibGuiCommon;
-import com.bacco.libgui.ScreenDrawing;
+import com.bacco.libgui.client.BackgroundPainter;
+import com.bacco.libgui.client.LibGuiCommon;
+import com.bacco.libgui.client.ScreenDrawing;
 import com.bacco.libgui.widget.data.CottonAxis;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -42,7 +42,7 @@ public class WSlider extends WAbstractSlider {
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
-        @Override
+    @Override
     public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
         if (backgroundPainter != null) {
             backgroundPainter.paintBackground(context, x, y, this);
@@ -53,7 +53,7 @@ public class WSlider extends WAbstractSlider {
             int thumbY;
             // thumbXOffset: thumb texture x offset in pixels
             int thumbXOffset;
-            ResourceLocation texture = shouldRenderInDarkMode() ? DARK_TEXTURE : LIGHT_TEXTURE;
+            ResourceLocation texture = false ? DARK_TEXTURE : LIGHT_TEXTURE;
 
             if (axis == CottonAxis.VERTICAL) {
                 int trackX = x + width / 2 - TRACK_WIDTH / 2;
@@ -88,14 +88,5 @@ public class WSlider extends WAbstractSlider {
                 ScreenDrawing.texturedRect(context, x + thumbX, y + thumbY, THUMB_SIZE, THUMB_SIZE, texture, 0 * px, 24 * px, 8 * px, 32 * px, 0xFFFFFFFF);
             }
         }
-    }
-
-        @Nullable
-    public BackgroundPainter getBackgroundPainter() {
-        return backgroundPainter;
-    }
-
-        public void setBackgroundPainter(@Nullable BackgroundPainter backgroundPainter) {
-        this.backgroundPainter = backgroundPainter;
     }
 }

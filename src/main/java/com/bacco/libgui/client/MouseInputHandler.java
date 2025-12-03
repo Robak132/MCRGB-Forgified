@@ -1,4 +1,4 @@
-package com.bacco.libgui;
+package com.bacco.libgui.client;
 
 import com.bacco.libgui.widget.WWidget;
 import com.bacco.libgui.widget.data.InputResult;

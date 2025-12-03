@@ -1,6 +1,6 @@
 package com.bacco.mcrrgb.gui;
 
-import com.bacco.libgui.ScreenDrawing;
+import com.bacco.libgui.client.ScreenDrawing;
 import com.bacco.libgui.widget.WSlider;
 import com.bacco.libgui.widget.data.CottonAxis;
 import net.minecraft.client.gui.GuiGraphics;

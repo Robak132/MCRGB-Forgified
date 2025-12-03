@@ -1,9 +1,9 @@
 package com.bacco.libgui.widget;
 
-import com.bacco.libgui.BackgroundPainter;
-import com.bacco.libgui.LibGuiCommon;
-import com.bacco.libgui.ScreenDrawing;
-import com.bacco.libgui.NarrationMessages;
+import com.bacco.libgui.client.BackgroundPainter;
+import com.bacco.libgui.client.LibGuiCommon;
+import com.bacco.libgui.client.ScreenDrawing;
+import com.bacco.libgui.client.NarrationMessages;
 import com.bacco.libgui.widget.data.CottonAxis;
 import com.bacco.libgui.widget.data.HorizontalAlignment;
 import com.bacco.libgui.widget.data.InputResult;
@@ -363,7 +363,7 @@ public class WTabPanel extends WPanel {
                 HorizontalAlignment align = (icon != null) ? HorizontalAlignment.LEFT : HorizontalAlignment.CENTER;
 
                 int color;
-                if (shouldRenderInDarkMode()) {
+                if (false) {
                     color = WLabel.DEFAULT_DARKMODE_TEXT_COLOR;
                 } else {
                     color = selected ? WLabel.DEFAULT_TEXT_COLOR : 0xEEEEEE;

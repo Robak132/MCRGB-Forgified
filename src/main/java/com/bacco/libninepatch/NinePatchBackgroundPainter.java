@@ -1,6 +1,6 @@
 package com.bacco.libninepatch;
 
-import com.bacco.libgui.BackgroundPainter;
+import com.bacco.libgui.client.BackgroundPainter;
 import com.bacco.libgui.widget.WWidget;
 import com.bacco.libgui.widget.data.Texture;
 import net.minecraft.client.gui.GuiGraphics;

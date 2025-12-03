@@ -1,6 +1,6 @@
 package com.bacco.libgui.widget;
 
-import com.bacco.libgui.NarrationMessages;
+import com.bacco.libgui.client.NarrationMessages;
 import com.bacco.libgui.widget.data.CottonAxis;
 import com.bacco.libgui.widget.data.InputResult;
 import net.minecraft.client.gui.narration.NarratedElementType;

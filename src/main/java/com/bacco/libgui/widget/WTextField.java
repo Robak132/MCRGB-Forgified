@@ -3,9 +3,9 @@ package com.bacco.libgui.widget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.bacco.libgui.BackgroundPainter;
-import com.bacco.libgui.ScreenDrawing;
-import com.bacco.libgui.NarrationMessages;
+import com.bacco.libgui.client.BackgroundPainter;
+import com.bacco.libgui.client.ScreenDrawing;
+import com.bacco.libgui.client.NarrationMessages;
 import com.bacco.libgui.widget.data.InputResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -59,7 +59,7 @@ public class WTextField extends WWidget {
 
     private Predicate<String> textPredicate;
 
-        @Nullable
+    @Nullable
     private BackgroundPainter backgroundPainter;
 
     public WTextField() {
@@ -141,18 +141,18 @@ public class WTextField extends WWidget {
         return this.cursor;
     }
 
-        public void scrollCursorIntoView() {
-        if (scrollOffset > cursor) {
-            scrollOffset = cursor;
-        }
-        if (scrollOffset < cursor && font.plainSubstrByWidth(text.substring(scrollOffset), width - TEXT_PADDING_X * 2).length() + scrollOffset < cursor) {
-            scrollOffset = cursor;
-        }
-
-        checkScrollOffset();
+    public void scrollCursorIntoView() {
+    if (scrollOffset > cursor) {
+        scrollOffset = cursor;
+    }
+    if (scrollOffset < cursor && font.plainSubstrByWidth(text.substring(scrollOffset), width - TEXT_PADDING_X * 2).length() + scrollOffset < cursor) {
+        scrollOffset = cursor;
     }
 
-        private void checkScrollOffset() {
+    checkScrollOffset();
+}
+
+    private void checkScrollOffset() {
         int rightMostScrollOffset = text.length() - font.plainSubstrByWidth(text, width - TEXT_PADDING_X * 2, true).length();
         scrollOffset = Math.min(rightMostScrollOffset, scrollOffset);
     }
@@ -181,66 +181,66 @@ public class WTextField extends WWidget {
         return this;
     }
 
-        protected void renderBox(GuiGraphics context, int x, int y) {
-        int borderColor = this.isFocused() ? BORDER_COLOR_SELECTED : BORDER_COLOR_UNSELECTED;
-        ScreenDrawing.coloredRect(context, x - 1, y - 1, width + 2, height + 2, borderColor);
-        ScreenDrawing.coloredRect(context, x, y, width, height, BACKGROUND_COLOR);
+    protected void renderBox(GuiGraphics context, int x, int y) {
+    int borderColor = this.isFocused() ? BORDER_COLOR_SELECTED : BORDER_COLOR_UNSELECTED;
+    ScreenDrawing.coloredRect(context, x - 1, y - 1, width + 2, height + 2, borderColor);
+    ScreenDrawing.coloredRect(context, x, y, width, height, BACKGROUND_COLOR);
+}
+
+    protected void renderText(GuiGraphics context, int x, int y, String visibleText) {
+    int textColor = this.editable ? this.enabledColor : this.disabledColor;
+    context.drawString(font, visibleText, x + TEXT_PADDING_X, y + TEXT_PADDING_Y, textColor, true);
+}
+
+    protected void renderCursor(GuiGraphics context, int x, int y, String visibleText) {
+    if (this.tickCount / 6 % 2 == 0) return;
+    if (this.cursor < this.scrollOffset) return;
+    if (this.cursor > this.scrollOffset + visibleText.length()) return;
+    int cursorOffset = this.font.width(visibleText.substring(0, this.cursor - this.scrollOffset));
+    ScreenDrawing.coloredRect(context, x + TEXT_PADDING_X + cursorOffset, y + CURSOR_PADDING_Y, 1, CURSOR_HEIGHT, CURSOR_COLOR);
+}
+
+    protected void renderSuggestion(GuiGraphics context, int x, int y) {
+    if (this.suggestion == null) return;
+    context.drawString(font, suggestion, x + TEXT_PADDING_X, y + TEXT_PADDING_Y, this.suggestionColor, true);
+}
+
+    protected void renderSelection(GuiGraphics context, int x, int y, String visibleText) {
+    if (select == cursor || select == -1) return;
+
+    int textLength = visibleText.length();
+
+    int left = Math.min(cursor, select);
+    int right = Math.max(cursor, select);
+
+    if (right < scrollOffset || left > scrollOffset + textLength) return;
+
+    int normalizedLeft = Math.max(scrollOffset, left) - scrollOffset;
+    int normalizedRight = Math.min(scrollOffset + textLength, right) - scrollOffset;
+
+    int leftCaret = font.width(visibleText.substring(0, normalizedLeft));
+    int selectionWidth = font.width(visibleText.substring(normalizedLeft, normalizedRight));
+
+    invertedRect(context, x + TEXT_PADDING_X + leftCaret, y + CURSOR_PADDING_Y, selectionWidth, CURSOR_HEIGHT);
+}
+
+    protected void renderTextField(GuiGraphics context, int x, int y) {
+    if (this.font == null) this.font = Minecraft.getInstance().font;
+
+    checkScrollOffset();
+    String visibleText = font.plainSubstrByWidth(this.text.substring(this.scrollOffset), this.width - 2 * TEXT_PADDING_X);
+    renderBox(context, x, y);
+    renderText(context, x, y, visibleText);
+    if (this.text.isEmpty() && !this.isFocused()) {
+        renderSuggestion(context, x, y);
     }
-
-        protected void renderText(GuiGraphics context, int x, int y, String visibleText) {
-        int textColor = this.editable ? this.enabledColor : this.disabledColor;
-        context.drawString(font, visibleText, x + TEXT_PADDING_X, y + TEXT_PADDING_Y, textColor, true);
+    if (this.isFocused()) {
+        renderCursor(context, x, y, visibleText);
     }
+    renderSelection(context, x, y, visibleText);
+}
 
-        protected void renderCursor(GuiGraphics context, int x, int y, String visibleText) {
-        if (this.tickCount / 6 % 2 == 0) return;
-        if (this.cursor < this.scrollOffset) return;
-        if (this.cursor > this.scrollOffset + visibleText.length()) return;
-        int cursorOffset = this.font.width(visibleText.substring(0, this.cursor - this.scrollOffset));
-        ScreenDrawing.coloredRect(context, x + TEXT_PADDING_X + cursorOffset, y + CURSOR_PADDING_Y, 1, CURSOR_HEIGHT, CURSOR_COLOR);
-    }
-
-        protected void renderSuggestion(GuiGraphics context, int x, int y) {
-        if (this.suggestion == null) return;
-        context.drawString(font, suggestion, x + TEXT_PADDING_X, y + TEXT_PADDING_Y, this.suggestionColor, true);
-    }
-
-        protected void renderSelection(GuiGraphics context, int x, int y, String visibleText) {
-        if (select == cursor || select == -1) return;
-
-        int textLength = visibleText.length();
-
-        int left = Math.min(cursor, select);
-        int right = Math.max(cursor, select);
-
-        if (right < scrollOffset || left > scrollOffset + textLength) return;
-
-        int normalizedLeft = Math.max(scrollOffset, left) - scrollOffset;
-        int normalizedRight = Math.min(scrollOffset + textLength, right) - scrollOffset;
-
-        int leftCaret = font.width(visibleText.substring(0, normalizedLeft));
-        int selectionWidth = font.width(visibleText.substring(normalizedLeft, normalizedRight));
-
-        invertedRect(context, x + TEXT_PADDING_X + leftCaret, y + CURSOR_PADDING_Y, selectionWidth, CURSOR_HEIGHT);
-    }
-
-        protected void renderTextField(GuiGraphics context, int x, int y) {
-        if (this.font == null) this.font = Minecraft.getInstance().font;
-
-        checkScrollOffset();
-        String visibleText = font.plainSubstrByWidth(this.text.substring(this.scrollOffset), this.width - 2 * TEXT_PADDING_X);
-        renderBox(context, x, y);
-        renderText(context, x, y, visibleText);
-        if (this.text.isEmpty() && !this.isFocused()) {
-            renderSuggestion(context, x, y);
-        }
-        if (this.isFocused()) {
-            renderCursor(context, x, y, visibleText);
-        }
-        renderSelection(context, x, y, visibleText);
-    }
-
-        private void invertedRect(GuiGraphics context, int x, int y, int width, int height) {
+    private void invertedRect(GuiGraphics context, int x, int y, int width, int height) {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.getBuilder();
         Matrix4f model = context.pose().last().pose();
@@ -293,7 +293,7 @@ public class WTextField extends WWidget {
         return this;
     }
 
-        public WTextField setBackgroundPainter(BackgroundPainter painter) {
+    public WTextField setBackgroundPainter(BackgroundPainter painter) {
         this.backgroundPainter = painter;
         return this;
     }
@@ -303,16 +303,11 @@ public class WTextField extends WWidget {
     }
 
     @Override
-    public void onFocusGained() {
-        // Ignore
-    }
-
-        @Override
     public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
         renderTextField(context, x, y);
     }
 
-        @Override
+    @Override
     public InputResult onClick(int x, int y, int button) {
         requestFocus();
         cursor = getCaretPosition(x - TEXT_PADDING_X);

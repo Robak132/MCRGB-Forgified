@@ -1,8 +1,6 @@
 package com.bacco.libgui.widget;
 
-import com.bacco.libgui.CottonHud;
 import com.bacco.libgui.GuiDescription;
-import com.bacco.libgui.TriState;
 import com.bacco.libgui.VisualLogger;
 import com.bacco.libgui.widget.data.InputResult;
 import com.bacco.libgui.widget.data.ObservableProperty;
@@ -43,10 +41,7 @@ public abstract class WWidget {
      * The height of this widget, defaults to 18 pixels.
      */
     protected int height = 18;
-    /**
-     * The containing {@link GuiDescription} of this widget.
-     * Can be null if this widget is a {@linkplain CottonHud HUD} widget.
-     */
+
     @Nullable
     protected GuiDescription host;
 
@@ -177,7 +172,7 @@ public abstract class WWidget {
      * @param button The mouse button that was used. Button numbering is consistent with LWJGL Mouse (0=left, 1=right, 2=mousewheel click)
      * @return {@link InputResult#PROCESSED} if the event is handled, {@link InputResult#IGNORED} otherwise.
      */
-        public InputResult onMouseDown(int x, int y, int button) {
+    public InputResult onMouseDown(int x, int y, int button) {
         return InputResult.IGNORED;
     }
 
@@ -192,7 +187,7 @@ public abstract class WWidget {
      * @return {@link InputResult#PROCESSED} if the event is handled, {@link InputResult#IGNORED} otherwise.
      * @since 1.5.0
      */
-        public InputResult onMouseDrag(int x, int y, int button, double deltaX, double deltaY) {
+    public InputResult onMouseDrag(int x, int y, int button, double deltaX, double deltaY) {
         return InputResult.IGNORED;
     }
 
@@ -204,7 +199,7 @@ public abstract class WWidget {
      * @param button The mouse button that was used. Button numbering is consistent with LWJGL Mouse (0=left, 1=right, 2=mousewheel click)
      * @return {@link InputResult#PROCESSED} if the event is handled, {@link InputResult#IGNORED} otherwise.
      */
-        public InputResult onMouseUp(int x, int y, int button) {
+    public InputResult onMouseUp(int x, int y, int button) {
         return InputResult.IGNORED;
     }
 
@@ -216,7 +211,7 @@ public abstract class WWidget {
      * @param button The mouse button that was used. Button numbering is consistent with LWJGL Mouse (0=left, 1=right, 2=mousewheel click)
      * @return {@link InputResult#PROCESSED} if the event is handled, {@link InputResult#IGNORED} otherwise.
      */
-        public InputResult onClick(int x, int y, int button) {
+    public InputResult onClick(int x, int y, int button) {
         return InputResult.IGNORED;
     }
 
@@ -228,7 +223,7 @@ public abstract class WWidget {
      * @param amount The scrolled amount. Positive values are up and negative values are down.
      * @return {@link InputResult#PROCESSED} if the event is handled, {@link InputResult#IGNORED} otherwise.
      */
-        public InputResult onMouseScroll(int x, int y, double amount) {
+    public InputResult onMouseScroll(int x, int y, double amount) {
         return InputResult.IGNORED;
     }
 
@@ -240,7 +235,7 @@ public abstract class WWidget {
      * @return {@link InputResult#PROCESSED} if the event is handled, {@link InputResult#IGNORED} otherwise.
      * @since 1.5.0
      */
-        public InputResult onMouseMove(int x, int y) {
+    public InputResult onMouseMove(int x, int y) {
         return InputResult.IGNORED;
     }
 
@@ -251,7 +246,7 @@ public abstract class WWidget {
      * @param ch the character typed
      * @return {@link InputResult#PROCESSED} if the event is handled, {@link InputResult#IGNORED} otherwise.
      */
-        public InputResult onCharTyped(char ch) {
+    public InputResult onCharTyped(char ch) {
         return InputResult.IGNORED;
     }
 
@@ -261,7 +256,7 @@ public abstract class WWidget {
      * @param key the GLFW scancode of the key
      * @return {@link InputResult#PROCESSED} if the event is handled, {@link InputResult#IGNORED} otherwise.
      */
-        public InputResult onKeyPressed(int ch, int key, int modifiers) {
+    public InputResult onKeyPressed(int ch, int key, int modifiers) {
         return InputResult.IGNORED;
     }
 
@@ -271,7 +266,7 @@ public abstract class WWidget {
      * @param key the GLFW scancode of the key
      * @return {@link InputResult#PROCESSED} if the event is handled, {@link InputResult#IGNORED} otherwise.
      */
-        public InputResult onKeyReleased(int ch, int key, int modifiers) {
+    public InputResult onKeyReleased(int ch, int key, int modifiers) {
         return InputResult.IGNORED;
     }
 
@@ -339,7 +334,7 @@ public abstract class WWidget {
      * @param mouseY  the X coordinate of the cursor
      * @since 2.0.0
      */
-        public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
+    public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
     }
 
     /**
@@ -365,7 +360,7 @@ public abstract class WWidget {
      * @param tX      the X coordinate of the tooltip
      * @param tY      the Y coordinate of the tooltip
      */
-        public void renderTooltip(GuiGraphics context, int x, int y, int tX, int tY) {
+    public void renderTooltip(GuiGraphics context, int x, int y, int tX, int tY) {
         TooltipBuilder builder = new TooltipBuilder();
         addTooltip(builder);
 
@@ -424,7 +419,7 @@ public abstract class WWidget {
      *
      * @param tooltip the builder to add tooltip lines to
      */
-        public void addTooltip(TooltipBuilder tooltip) {
+    public void addTooltip(TooltipBuilder tooltip) {
     }
 
     /**
@@ -437,7 +432,7 @@ public abstract class WWidget {
     /**
      * Executes a client-side tick for this widget.
      */
-        public void tick() {
+    public void tick() {
     }
 
     /**
@@ -487,7 +482,7 @@ public abstract class WWidget {
      *
      * @since 3.0.0
      */
-        public void addPainters() {
+    public void addPainters() {
     }
 
     /**
@@ -564,28 +559,6 @@ public abstract class WWidget {
      * @param builder the narration builder, cannot be null
      * @since 4.2.0
      */
-        public void addNarrations(NarrationElementOutput builder) {
-    }
-
-    /**
-     * Checks if this widget should be rendered in dark mode.
-     *
-     * <p>If the widget has a host that {@linkplain GuiDescription#isDarkMode() forces dark mode},
-     * the forced value is used. Otherwise, this method returns {@link LibGui#isDarkMode()}.
-     *
-     * <p>{@linkplain #paint Painting} should respect this value for general-purpose widgets
-     * intended for use in multiple different GUIs.
-     *
-     * @return {@code true} if this widget should be rendered in dark mode, {@code false} otherwise
-     * @since 7.1.0
-     */
-        public boolean shouldRenderInDarkMode() {
-            var globalDarkMode = false;
-
-        if (host != null) {
-            return TriState.FALSE.orElse(globalDarkMode);
-        }
-
-        return globalDarkMode;
+    public void addNarrations(NarrationElementOutput builder) {
     }
 }

@@ -1,6 +1,6 @@
-package com.bacco.libgui.gui;
+package com.bacco.mcrrgb.gui;
 
-import com.bacco.libgui.CottonClientScreen;
+import com.bacco.libgui.client.CottonClientScreen;
 import com.bacco.libgui.GuiDescription;
 
 public class ColourScreen extends CottonClientScreen {

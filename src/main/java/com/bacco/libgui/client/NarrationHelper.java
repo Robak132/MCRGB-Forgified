@@ -1,4 +1,4 @@
-package com.bacco.libgui;
+package com.bacco.libgui.client;
 
 import com.bacco.libgui.widget.WPanel;
 import com.bacco.libgui.widget.WWidget;

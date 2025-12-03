@@ -1,4 +1,4 @@
-package com.bacco.libgui;
+package com.bacco.libgui.client;
 
 
 import net.minecraft.network.chat.Component;

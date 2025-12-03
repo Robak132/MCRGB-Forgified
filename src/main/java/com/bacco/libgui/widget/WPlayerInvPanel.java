@@ -2,8 +2,8 @@ package com.bacco.libgui.widget;
 
 import com.bacco.libgui.GuiDescription;
 import com.bacco.libgui.SyncedGuiDescription;
-import com.bacco.libgui.BackgroundPainter;
-import com.bacco.libgui.NarrationMessages;
+import com.bacco.libgui.client.BackgroundPainter;
+import com.bacco.libgui.client.NarrationMessages;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.Nullable;

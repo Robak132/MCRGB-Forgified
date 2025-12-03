@@ -2,7 +2,7 @@ package com.bacco.libgui.widget;
 
 import net.minecraft.client.gui.GuiGraphics;
 
-import com.bacco.libgui.Scissors;
+import com.bacco.libgui.client.Scissors;
 
 /**
  * A panel that is clipped to only render widgets inside its bounds.

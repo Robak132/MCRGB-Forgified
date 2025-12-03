@@ -1,7 +1,7 @@
 package com.bacco.libgui.widget;
 
-import com.bacco.libgui.ScreenDrawing;
-import com.bacco.libgui.NarrationMessages;
+import com.bacco.libgui.client.ScreenDrawing;
+import com.bacco.libgui.client.NarrationMessages;
 import com.bacco.libgui.widget.data.HorizontalAlignment;
 import com.bacco.libgui.widget.data.InputResult;
 import com.bacco.libgui.widget.icon.Icon;
@@ -17,7 +17,6 @@ import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.Nullable;
 
 public class WButton extends WWidget {
-    private static final ResourceLocation DARK_WIDGETS_LOCATION = new ResourceLocation("libgui", "textures/widget/dark_widgets.png");
     private static final int BUTTON_HEIGHT = 20;
     private static final int ICON_SPACING = 2;
     protected int color = WLabel.DEFAULT_TEXT_COLOR;
@@ -63,22 +62,6 @@ public class WButton extends WWidget {
         this.label = label;
     }
 
-    /**
-     * Constructs a button with an icon and a label.
-     *
-     * @param icon  the icon
-     * @param label the label
-     * @since 2.2.0
-     */
-    public WButton(@Nullable Icon icon, @Nullable Component label) {
-        this.icon = icon;
-        this.label = label;
-    }
-
-        static ResourceLocation getTexture(WWidget widget) {
-        return widget.shouldRenderInDarkMode() ? DARK_WIDGETS_LOCATION : AbstractWidget.WIDGETS_LOCATION;
-    }
-
     @Override
     public boolean canResize() {
         return true;
@@ -89,7 +72,7 @@ public class WButton extends WWidget {
         return true;
     }
 
-        @Override
+    @Override
     public void paint(GuiGraphics context, int x, int y, int mouseX, int mouseY) {
         boolean hovered = (mouseX >= 0 && mouseY >= 0 && mouseX < getWidth() && mouseY < getHeight());
         int state = 1; //1=regular. 2=hovered. 0=disabled.
@@ -109,7 +92,7 @@ public class WButton extends WWidget {
 
         float buttonEndLeft = (200 - (getWidth() / 2)) * px;
 
-        ResourceLocation texture = getTexture(this);
+            ResourceLocation texture = AbstractWidget.WIDGETS_LOCATION;
         ScreenDrawing.texturedRect(context, x, y, getWidth() / 2, 20, texture, buttonLeft, buttonTop, buttonLeft + buttonWidth, buttonTop + buttonHeight, 0xFFFFFFFF);
         ScreenDrawing.texturedRect(context, x + (getWidth() / 2), y, getWidth() / 2, 20, texture, buttonEndLeft, buttonTop, 200 * px, buttonTop + buttonHeight, 0xFFFFFFFF);
 

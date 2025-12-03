@@ -124,11 +124,11 @@ public class ColourVector {
     }
 
     public int getVal(){
-        return Math.round(100f*(new RGB(this.r,this.g,this.b).getValue()/255f));
+        return Math.round(100f*(new RGB(this.r,this.g,this.b).value()/255f));
     }
 
     public int getVal255(){
-        return new RGB(this.r,this.g,this.b).getValue();
+        return new RGB(this.r,this.g,this.b).value();
     }
 
     public int getSatL(){
@@ -169,8 +169,7 @@ public class ColourVector {
         if(obj == null) return false;
         if(getClass() != obj.getClass()) return false;
         ColourVector other = (ColourVector) obj;
-        if(this.r != other.r || this.g != other.g || this.b != other.b) return false;
-        return true;
+        return this.r == other.r && this.g == other.g && this.b == other.b;
     }
 
     public ColourVector div(int i){

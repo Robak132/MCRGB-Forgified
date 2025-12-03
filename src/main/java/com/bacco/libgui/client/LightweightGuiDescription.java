@@ -1,5 +1,7 @@
-package com.bacco.libgui;
+package com.bacco.libgui.client;
 
+import com.bacco.libgui.GuiDescription;
+import com.bacco.libgui.TriState;
 import com.bacco.libgui.widget.ValidatedSlot;
 import com.bacco.libgui.widget.WGridPanel;
 import com.bacco.libgui.widget.WLabel;

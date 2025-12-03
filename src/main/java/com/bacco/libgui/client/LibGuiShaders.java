@@ -1,4 +1,4 @@
-package com.bacco.libgui;
+package com.bacco.libgui.client;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.renderer.ShaderInstance;
@@ -24,14 +24,10 @@ public final class LibGuiShaders {
         }
     }
 
-    private static ShaderInstance assertPresent(ShaderInstance program, String name) {
-        if (program == null) {
-            throw new NullPointerException("Shader libgui:" + name + " not initialised!");
-        }
-
-        return program;
-    }
     public static ShaderInstance getTiledRectangle() {
-        return assertPresent(tiledRectangle, "tiled_rectangle");
+        if (tiledRectangle == null) {
+            throw new NullPointerException("Shader libgui: tiled_rectangle not initialised!");
+        }
+        return tiledRectangle;
     }
 }
