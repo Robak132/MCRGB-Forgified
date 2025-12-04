@@ -1,8 +1,8 @@
 # MCRGB Mod for Minecraft Fabric 1.20.1+
 
-- [Modrinth](https://modrinth.com/mod/mcrgb)
+- [Modrinth](https://modrinth.com/mod/mcrgb_forge)
 
-- [Curseforge](https://legacy.curseforge.com/minecraft/mc-mods/mcrgb-a-colour-picker-for-minecraft-blocks)
+- [Curseforge](https://legacy.curseforge.com/minecraft/mc-mods/mcrgb_forge-a-colour-picker-for-minecraft-blocks)
 
 - [Discord](https://discord.gg/883ybFjSEf)
 
@@ -49,7 +49,7 @@ Optional: You can also view this info in regular inventories by changing the con
 
 ## How it works:
 
-On first launch, MCRGB will generate a file, located in `.minecraft/mcrgb_colours/file.json`
+On first launch, MCRGB will generate a file, located in `.minecraft/mcrgb_forge_colours/file.json`
 MCRGB attempts to scan every block texture in the game and calculates the dominant colours by grouping together similar pixels based on their euclidean distance in sRGB space, and calculating the mean average of each group. The results are saved in this file. If you ever need to regenerate the file (if you've changed resource packs or added new mods which add more blocks), click the "Refresh" button in the colour picker UI.
 
 When you input a colour to the colour picker, the list of blocks is sorted by the euclidean distance to each of the dominant colours in each texture. Each texture is weighted according to how much of that colour takes up in the texture. 

@@ -56,6 +56,12 @@ minecraft {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
 
+        gameTestServer {
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
         data {
             workingDirectory project.file('run-data')
 
@@ -82,8 +88,8 @@ java {
 
 mixin {
     // MixinGradle Settings
-    add sourceSets.main, 'mixins.mcrgb.refmap.json'
-    config 'mixins.mcrgb.json'
+    add sourceSets.main, 'mixins.mcrgb_forge.refmap.json'
+    config 'mixins.mcrgb_forge.json'
 
     debug.verbose = true
     debug.export = true

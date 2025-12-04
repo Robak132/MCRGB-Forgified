@@ -10,5 +10,5 @@ import java.util.List;
 @Mixin(Screen.class)
 public interface ScreenAccessor {
     @Accessor("children")
-    List<GuiEventListener> mcrgb$getChildren(); // NOSONAR
+    List<GuiEventListener> mcrgb_forge$getChildren(); // NOSONAR
 }
