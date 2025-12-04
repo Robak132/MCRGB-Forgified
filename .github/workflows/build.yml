@@ -42,7 +42,9 @@ jobs:
         
       - name: Accept EULA
         if: ${{ !inputs.is-release }}
-        run: echo "eula=true" > eula.txt
+        run: |
+          ls -l
+          echo "eula=true" > eula.txt
         
       - name: Run Gametests
         if: ${{ !inputs.is-release }}
