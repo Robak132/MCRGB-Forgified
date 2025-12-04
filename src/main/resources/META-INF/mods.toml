@@ -4,20 +4,20 @@ license="MIT"
 issueTrackerURL="https://github.com/Robak132/MCRGB/issues"
 
 [[mods]]
-modId="mcrgb"
+modId="mcrgb_forge"
 version="0.3_1.20.1"
 displayName="MCRGB"
 description="Port moda z Fabric na Forge."
 authors="Robak132"
 
-[[dependencies.mcrgb]]
+[[dependencies.mcrgb_forge]]
 modId="forge"
 mandatory=true
 versionRange="[47,)"
 ordering="NONE"
 side="BOTH"
 
-[[dependencies.mcrgb]]
+[[dependencies.mcrgb_forge]]
 modId="minecraft"
 mandatory=true
 versionRange="[1.20.1]"

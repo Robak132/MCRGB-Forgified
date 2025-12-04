@@ -1,0 +1,10 @@
+{
+    "key.mcrgb_forge.colour_inv_open" : "Open Colour Picker",
+    "message.mcrgb_forge.reloaded" : "MCRGB: Reloaded Colours",
+    "tooltip.mcrgb_forge.shift_prompt" : "Hold SHIFT to view colour info",
+    "ui.mcrgb_forge.header" : "MCRGB Colour Picker",
+    "ui.mcrgb_forge.saved_colours" : "Saved Colours:",
+    "options.mcrgb_forge.picker_only" : "Colour Picker Only",
+    "option.mcrgb_forge.always_show_in_tooltips" : "Show Block Colours in Tooltips",
+    "tooltip.mcrgb_forge.always_show_in_tooltips" : "Controls whether colour info is displayed in item tooltips outside of the colour picker UI."
+}

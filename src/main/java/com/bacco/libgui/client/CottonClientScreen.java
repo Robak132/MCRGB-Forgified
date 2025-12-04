@@ -64,7 +64,7 @@ public class CottonClientScreen extends Screen implements CottonScreenImpl {
 
         if (root != null) {
             GuiEventListener rootPanelElement = FocusElements.ofPanel(root);
-            ((ScreenAccessor) this).mcrgb$getChildren().add(rootPanelElement);
+            ((ScreenAccessor) this).mcrgb_forge$getChildren().add(rootPanelElement);
             setInitialFocus(rootPanelElement);
         } else {
             LOGGER.warn("No root panel found, keyboard navigation disabled");
