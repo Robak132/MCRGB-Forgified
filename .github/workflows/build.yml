@@ -31,7 +31,7 @@ jobs:
           cache-disabled: ${{ inputs.is-release }}
           cache-read-only: false
 
-      - name: build (non-Windows)
+      - name: build (Linux)
         if: ${{ runner.os != 'Windows' }}
         run: ./gradlew build
         
@@ -46,17 +46,29 @@ jobs:
           mkdir -p run
           echo "eula=true" > run/eula.txt
           
-      - name: Run Gametests
-        if: ${{ !inputs.is-release }}
+      - name: Run Gametests (Linux)
+        if: ${{ !inputs.is-release && runner.os != 'Windows' }}
+        shell: bash
         run: |
           set -e
           ./gradlew runServer --stacktrace --info --warning-mode all || exit 1
       
-          # Universal crash detection
           if grep -R "---- Minecraft Crash Report ----" run; then
             echo "::error::Detected Minecraft crash report in logs!"
             exit 1
           fi
+
+      - name: Run Gametests (Windows)
+        if: ${{ !inputs.is-release && runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          ./gradlew.bat runServer --stacktrace --info --warning-mode all
+      
+          $matches = Select-String -Path "run\**\*" -Pattern "---- Minecraft Crash Report ----"
+          if ($matches) {
+            Write-Error "Detected Minecraft crash report in logs!"
+            exit 1
+          }
 
       - name: Publish
         if: ${{ inputs.is-release }}
