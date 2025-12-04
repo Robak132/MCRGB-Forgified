@@ -39,10 +39,11 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         shell: pwsh
         run: .\gradlew.bat build
-        
+
       - name: Accept EULA
         if: ${{ !inputs.is-release }}
         run: |
+          mkdir -p run
           echo "eula=true" > run/eula.txt
         
       - name: Run Gametests
