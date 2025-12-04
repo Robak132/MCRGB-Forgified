@@ -1,12 +1,20 @@
+import dev.ithundxr.silk.ChangelogText
+
 plugins {
-    id 'idea'
-    id 'java'
-    id 'java-library'
-    id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '6.0.+'
+    id "idea"
+    id "eclipse"
+    id "maven-publish"
+    id "net.kyori.blossom" version "2.1.0" // https://github.com/KyoriPowered/blossom
+    id "dev.ithundxr.silk" version "0.11.15" // https://github.com/ithundxr/silk
+    id "me.modmuss50.mod-publish-plugin" version "0.8.4" // https://github.com/modmuss50/mod-publish-plugin
+    id "net.neoforged.moddev.legacyforge" version "2.0.107" // https://projects.neoforged.net/neoforged/ModDevGradle
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'org.spongepowered.mixin' version '0.7.+'
+    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.8" // https://github.com/JetBrains/gradle-idea-ext-plugin
 }
+
+apply(from: "./gradle/java.gradle")
+apply(from: "gradle/property_loader.gradle")
 
 repositories {
     maven { url "https://maven.juuxel.me/" }
