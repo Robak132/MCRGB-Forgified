@@ -45,21 +45,35 @@ minecraft {
         }
 
         client {
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            property 'forge.enabledGameTestNamespaces', mod_id
+            client()
+
+            gameDirectory = project.file("run")
         }
 
         server {
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            property 'forge.enabledGameTestNamespaces', mod_id
+            server()
+
+            gameDirectory = project.file("run/server")
         }
 
         data {
-            workingDirectory project.file('run-data')
+            data()
 
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            gameDirectory = project.file("run")
+            systemProperty("forge.logging.markers", "REGISTRIES,REGISTRYDUMP")
+            systemProperty("forge.logging.console.level", "debug")
+            programArguments.addAll(
+                "--mod", mod_id as String,
+                "--all",
+                "--output", file("src/generated/resources/").getAbsolutePath(),
+                "--existing", file("src/main/resources").getAbsolutePath()
+            )
+        }
+
+        gameTestServer {
+            type = "gameTestServer"
+
+            gameDirectory = project.file("run/gametest")
         }
     }
 }
