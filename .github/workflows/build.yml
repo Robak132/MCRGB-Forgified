@@ -34,6 +34,12 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: 'gradle'
 
+      - name: maven-settings
+        uses: s4u/maven-settings-action@v2
+        with:
+          servers: '[{"id": "github", "username": "Robak132", "password": "${GITHUB_TOKEN_REF}"}]'
+          githubServer: false
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -42,6 +48,8 @@ jobs:
 
       - name: build (Linux)
         run: ./gradlew build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Accept EULA
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
