@@ -43,6 +43,7 @@ import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
@@ -59,6 +60,10 @@ public class MCRGBClient {
     private int fails = 0;
     private int successes = 0;
     private boolean scanned = false;
+
+    public static void init() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> ClothConfigIntegration.init());
+    }
 
     public static boolean isScanned() {
         return instance.scanned;
