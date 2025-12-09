@@ -8,10 +8,28 @@ plugins {
     id 'org.spongepowered.mixin' version '0.7.+'
 }
 
+def secretsFile = rootProject.file(".secret.properties")
+ext.secrets = new Properties()
+if (secretsFile.exists()) {
+    secretsFile.withInputStream { stream ->
+        secrets.load(stream)
+    }
+}
+
+def getSecret(String key) {
+    return secrets.getProperty(key) ?: System.getenv(key)
+}
+
 repositories {
-    maven { url "https://maven.juuxel.me/" }
     maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.minecraftforge.net" }
+    maven {
+        url = uri("https://maven.pkg.github.com/Robak132/LibGui-Forgified")
+        credentials {
+            username = getSecret("GITHUB_ACTOR")
+            password = getSecret("GITHUB_TOKEN")
+        }
+    }
     mavenCentral()
 }
 
@@ -74,10 +92,14 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     minecraft "net.minecraftforge:forge:1.20.1-47.4.13"
-    implementation "me.shedaniel.cloth:cloth-config-forge:11.1.136"
+    implementation 'org.projectlombok:lombok:1.18.38'
+    implementation "io.github.robak132:libgui_forge:8.1.1"
+    api fg.deobf("me.shedaniel.cloth:cloth-config-forge:11.1.136")
 
-    implementation project(':LibGui-Forgified')
-    annotationProcessor 'org.spongepowered:mixin:0.8.5'
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 java {
@@ -85,6 +107,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
     toolchain { languageVersion = JavaLanguageVersion.of(17) }
+    withSourcesJar()
 }
 
 mixin {

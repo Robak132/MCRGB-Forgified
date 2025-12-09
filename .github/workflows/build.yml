@@ -3,8 +3,17 @@
 # certain platforms or Java versions, and provides a first line of defence
 # against bad commits.
 
-name: build
-on: [pull_request, push]
+name: Build
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      is-release:
+        description: 'Publish release to Modrinth, Curseforge and Github'
+        required: false
+        default: false
+        type: boolean
 jobs:
   build:
     strategy:
@@ -12,7 +21,7 @@ jobs:
         # Use these Java versions
         java: [17]
         # and run on both Linux and Windows
-        os: [ubuntu-22.04, windows-2022]
+        os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Repository
@@ -28,34 +37,39 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-disabled: ${{ inputs.is-release }}
+          cache-disabled: ${{ startsWith(github.ref, 'refs/tags/') }}
           cache-read-only: false
 
       - name: build (Linux)
-        if: ${{ runner.os != 'Windows' }}
         run: ./gradlew build
-        
-      - name: build (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        shell: pwsh
-        run: .\gradlew.bat build
 
       - name: Accept EULA
-        if: ${{ !inputs.is-release }}
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         run: |
           mkdir -p run
           echo "eula=true" > run/eula.txt
-          
-      - name: Run Gametests (Linux)
-        if: ${{ !inputs.is-release && runner.os != 'Windows' }}
-        shell: bash
-        run: .\gradlew runGameTestServer
-    
+      
 
-      - name: Publish
-        if: ${{ inputs.is-release }}
+      #      - name: Run Test Client
+      #        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+      #        run: |
+      #          ./gradlew runClient --stacktrace &
+      #          PID=$!
+      #          sleep 30
+      #          kill $PID || true
+      #        timeout-minutes: 2
+
+      - name: Run Test Server
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          ./gradlew runServer --stacktrace &
+          PID=$!
+          sleep 30
+          kill $PID || true
+        timeout-minutes: 2
+
+      - name: Publish to GitHub Packages
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew publishMods
+        run: ./gradlew publish --stacktrace

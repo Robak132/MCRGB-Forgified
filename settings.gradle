@@ -8,7 +8,4 @@ pluginManagement {
 	}
 }
 
-rootProject.name = 'MCRGB-Forgified'
-
-include ':LibGui-Forgified'
-project(':LibGui-Forgified').projectDir = file('D:\\Dokumenty\\LibGui-Forgified')
+rootProject.name = 'MCRGB-Forge'

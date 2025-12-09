@@ -5,10 +5,10 @@ issueTrackerURL="https://github.com/Robak132/MCRGB/issues"
 
 [[mods]]
 modId="mcrgb_forge"
-version="0.3_1.20.1"
+version="0.3.1"
 displayName="MCRGB"
-description="Port moda z Fabric na Forge."
-authors="Robak132"
+description="Forge fork of MCRGB - Colour Picker for Minecraft Blocks!"
+authors="Robak132, Bacco"
 
 [[dependencies.mcrgb_forge]]
 modId="forge"
