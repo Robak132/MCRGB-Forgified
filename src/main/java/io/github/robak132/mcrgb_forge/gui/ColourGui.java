@@ -15,6 +15,7 @@ import io.github.robak132.libgui_forge.widget.data.Texture;
 import io.github.robak132.libgui_forge.widget.icon.TextureIcon;
 import io.github.robak132.mcrgb_forge.ColourVector;
 import io.github.robak132.mcrgb_forge.IItemBlockColourSaver;
+import io.github.robak132.mcrgb_forge.SpriteColour;
 import io.github.robak132.mcrgb_forge.SpriteDetails;
 import io.github.robak132.mcrgb_forge.client.ClothConfigIntegration;
 import io.github.robak132.mcrgb_forge.client.MCRGBClient;
@@ -505,13 +506,15 @@ public class ColourGui extends MCRGBBaseGui {
                 double weightless;
                 double weight;
                 SpriteDetails sprite = itemBlockColourSaver.mcrgb_forge$getSpriteDetails(j);
-                for (int i = 0; i < sprite.getColourInfo().size(); i++) {
-                    ColourVector colour = sprite.getColourInfo().get(i);
+                for (int i = 0; i < sprite.getColours().size(); i++) {
+                    SpriteColour spriteColour = sprite.getColours().get(i);
+                    ColourVector colour = spriteColour.color();
+                    weight = spriteColour.weight();
+
                     if (colour == null) {
                         return;
                     }
                     weightless = query.distance(colour) + 0.000001;
-                    weight = sprite.getWeight(i);
                     if (weightless / Math.pow(weight, 5) < distance || i == 0) {
                         distance = weightless / Math.pow(weight, 5);
                     }

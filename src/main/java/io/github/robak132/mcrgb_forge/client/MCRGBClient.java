@@ -279,16 +279,13 @@ public class MCRGBClient {
                 }
                 //Calculate the dominant colours
                 Set<ColourGroup> colourGroups = groupColours(rgbList);
-
-                //Add sprite name and each dominant color to the IItemBlockColourSaver
                 SpriteDetails spriteDetails = new SpriteDetails();
-                String[] namesplit = sprite.contents().name().toString().split("/");
-                spriteDetails.setName(namesplit[namesplit.length - 1]);
-                colourGroups.forEach(cg -> {
-                    spriteDetails.addColour(cg.getMeanColour());
-                    spriteDetails.addWeight(cg.getWeight());
-                });
-                storage.setBlock(block.asItem().getDescriptionId());
+                String spriteName = sprite.contents().name().getPath();
+                spriteDetails.setName(spriteName);
+                for (ColourGroup group : colourGroups) {
+                    spriteDetails.add(group.toSpriteColour(rgbList.size()));
+                }
+                storage.setBlockId(block.asItem().getDescriptionId());
                 storage.addSpriteDetails(spriteDetails);
             });
             IItemBlockColourSaver iItemBlockColourSaver = (IItemBlockColourSaver) block.asItem();
@@ -337,7 +334,7 @@ public class MCRGBClient {
             }, new ArrayList<>());
             ForgeRegistries.BLOCKS.forEach(block -> {
                 for (BlockColourStorage storage : loadedBlockColourArray) {
-                    if (storage.getBlock().equals(block.asItem().getDescriptionId())) {
+                    if (storage.getBlockId().equals(block.asItem().getDescriptionId())) {
                         IItemBlockColourSaver blockColourSaver = (IItemBlockColourSaver) block.asItem();
                         storage.getSpriteDetails().forEach(blockColourSaver::mcrgb_forge$addSpriteDetails);
                         break;
