@@ -2,8 +2,6 @@ package io.github.robak132.mcrgb_forge.client.gui.widgets;
 
 import io.github.robak132.libgui_forge.widget.WLabel;
 import io.github.robak132.libgui_forge.widget.data.InputResult;
-import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiDescription;
-import io.github.robak132.mcrgb_forge.colors.RGB;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -55,9 +53,6 @@ public class WClickableLabel extends WLabel {
 
     }
 
-    public void setOnClick(Runnable onClick) {
-        this.onClick = onClick;
-    }
 }
 
 

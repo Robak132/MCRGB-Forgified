@@ -21,12 +21,12 @@ public final class LAB implements Color {
         this.b = lab.b;
     }
 
-    public static float distanceSquared(LAB a, LAB b) {
-        float dL = a.L - b.L;
-        float da = a.a - b.a;
-        float db = a.b - b.b;
+    public double distanceWeighted(LAB other) {
+        double dL = (this.L - other.L) * 0.6;   // weaken brightness
+        double da = (this.a - other.a);
+        double db = (this.b - other.b);
 
-        return dL * dL + da * da + db * db;
+        return (da*da + db*db) * 1.6 + (dL*dL) * 0.5;
     }
 
     // sRGB 0..255 -> linear 0..1

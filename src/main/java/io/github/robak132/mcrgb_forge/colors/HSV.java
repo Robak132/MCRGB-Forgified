@@ -65,13 +65,13 @@ public final class HSV implements Color {
         return this;
     }
 
-    public float hue() {
+    public int hue() {
         return h;
     }
-    public float saturation() {
+    public int saturation() {
         return s;
     }
-    public float value() {
+    public int value() {
         return v;
     }
     public int alpha() {
