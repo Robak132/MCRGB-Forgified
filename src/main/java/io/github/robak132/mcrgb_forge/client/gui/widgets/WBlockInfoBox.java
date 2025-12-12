@@ -5,8 +5,6 @@ import io.github.robak132.libgui_forge.widget.WBox;
 import io.github.robak132.libgui_forge.widget.data.Insets;
 import io.github.robak132.mcrgb_forge.client.MCRGBClient;
 import io.github.robak132.mcrgb_forge.client.analysis.SpriteDetails;
-import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiDescription;
-import io.github.robak132.mcrgb_forge.colors.RGB;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -31,7 +29,7 @@ public class WBlockInfoBox extends WBox {
         setInsets(Insets.ROOT_PANEL);
         Block block = Block.byItem(item);
 
-        Map<Block, List<SpriteDetails>> scan = MCRGBClient.getLastScan();
+        Map<Block, List<SpriteDetails>> scan = MCRGBClient.lastScan;
         if (scan == null) {
             return;
         }

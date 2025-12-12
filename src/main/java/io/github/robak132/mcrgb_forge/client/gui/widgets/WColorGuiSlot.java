@@ -93,7 +93,7 @@ public class WColorGuiSlot extends WWidget {
         Block block = Block.byItem(stack.getItem());
 
         // Get the latest scan data
-        Map<Block, List<SpriteDetails>> scan = MCRGBClient.getLastScan();
+        Map<Block, List<SpriteDetails>> scan = MCRGBClient.lastScan;
         if (scan == null) {
             return;
         }
@@ -121,16 +121,7 @@ public class WColorGuiSlot extends WWidget {
 
                 // Color block (⬛)
                 MutableComponent colorBox = Component.literal("⬛").withStyle(Style.EMPTY.withColor(col));
-
-                // First line → title
-                MutableComponent out;
-                if (i == 0) {
-                    out = text.withStyle(ChatFormatting.DARK_GRAY);
-                } else {
-                    out = colorBox.append(text);
-                }
-
-                tooltip.add(out);
+                tooltip.add((i == 0) ? text.withStyle(ChatFormatting.DARK_GRAY) : colorBox.append(text));
             }
         }
     }

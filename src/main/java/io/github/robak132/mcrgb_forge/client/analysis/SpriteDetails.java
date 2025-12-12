@@ -26,7 +26,7 @@ public class SpriteDetails {
         strings.add(name + ":");
 
         for (SpriteColor sc : colors) {
-            strings.add(sc.color().getHex() + "  " + sc.weight() + "%");
+            strings.add(sc.color().toHexString() + "  " + sc.weight() + "%");
         }
 
         return strings;
@@ -40,7 +40,7 @@ public class SpriteDetails {
         list.add(0xFFFFFF); // Title color
 
         for (SpriteColor sc : colors) {
-            String hex = sc.color().getHex().substring(1);
+            String hex = sc.color().toHexString().substring(1);
             list.add(Integer.parseInt(hex, 16));
         }
 

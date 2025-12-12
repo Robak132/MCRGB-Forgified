@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.IForgeBakedModel;
 import net.minecraftforge.client.model.data.ModelData;
 
+@Slf4j
 public class ColorScanner {
 
     private static final Minecraft mc = Minecraft.getInstance();
@@ -47,6 +49,7 @@ public class ColorScanner {
      * Performs the scan synchronously.
      */
     public ScanResult scan(List<Block> blocks) {
+        log.info("Starting color scan of {} blocks", blocks.size());
         Map<Block, List<SpriteDetails>> result = new HashMap<>();
 
         for (Block block : blocks) {

@@ -41,7 +41,7 @@ public class WSavedPalettesArea extends WPlainPanel {
             pwig.palette = p;
             pwig.buildPaletteWidget(cg);
             for (int i = 0; i < pwig.savedColors.size(); i++) {
-                String hex = p.getColor(i).getHex().replace("#", "");
+                String hex = p.getColor(i).toHexString().replace("#", "");
                 int c = Integer.parseInt(hex, 16);
                 pwig.savedColors.get(i).setColor(c);
             }

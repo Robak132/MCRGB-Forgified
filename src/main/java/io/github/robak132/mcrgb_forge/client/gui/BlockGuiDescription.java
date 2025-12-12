@@ -17,8 +17,6 @@ import io.github.robak132.mcrgb_forge.client.gui.widgets.WBlockInfoBox;
 import io.github.robak132.mcrgb_forge.client.gui.widgets.WButtonWithTooltip;
 import io.github.robak132.mcrgb_forge.client.gui.widgets.WPickableTexture;
 import io.github.robak132.mcrgb_forge.client.gui.widgets.WTextureThumbnail;
-import io.github.robak132.mcrgb_forge.colors.Color;
-import io.github.robak132.mcrgb_forge.colors.Color.ColorModel;
 import io.github.robak132.mcrgb_forge.colors.RGB;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +119,7 @@ public class BlockGuiDescription extends AbstractGuiDescription {
     }
 
     private void back() {
-        Map<Block, List<SpriteDetails>> lastScan = MCRGBClient.getLastScan();
+        Map<Block, List<SpriteDetails>> lastScan = MCRGBClient.lastScan;
         if (lastScan != null) {
             Minecraft.getInstance().setScreen(new CottonClientScreen(new ColorsGuiDescription(inputColor.toRGB(), lastScan)));
         }

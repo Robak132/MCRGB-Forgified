@@ -1,6 +1,7 @@
 package io.github.robak132.mcrgb_forge.client.gui;
 
 import static io.github.robak132.mcrgb_forge.MCRGBMod.MOD_ID;
+import static io.github.robak132.mcrgb_forge.client.utils.ChatUtils.displayClientLocalisedMessage;
 
 import io.github.robak132.libgui_forge.client.CottonClientScreen;
 import io.github.robak132.libgui_forge.widget.WButton;
@@ -54,7 +55,6 @@ public class ColorsGuiDescription extends AbstractGuiDescription {
     private final List<ItemStack> stacks = new ArrayList<>();
     private final List<WColorGuiSlot> wColorGuiSlots = new ArrayList<>();
     private final Map<Block, List<SpriteDetails>> blockSpriteMap;
-    private boolean enableSliderListeners = true;
     private ColorModel mode = ColorModel.RGB;
 
     WLabel rLabel = new WLabel(Component.translatable("ui.mcrgb_forge.r_for_red"), 0xFFFF0000);
@@ -88,16 +88,7 @@ public class ColorsGuiDescription extends AbstractGuiDescription {
     WColorScrollBar scrollBar = new WColorScrollBar(this::placeSlots);
     WPlainPanel inputs = new WPlainPanel();
     WGridPanel armourSlots = new WGridPanel();
-    private int suppressEventsDepth = 0;
-
-    private boolean eventsSuppressed() {
-        return suppressEventsDepth > 0;
-    }
-
-    private SilentCloseable suppressEvents() {
-        suppressEventsDepth++;
-        return () -> suppressEventsDepth--;
-    }
+    private boolean refreshing = false;
 
     public ColorsGuiDescription(RGB launchColor, Map<Block, List<SpriteDetails>> blockSpriteMap) {
         this.blockSpriteMap = blockSpriteMap;
@@ -195,8 +186,7 @@ public class ColorsGuiDescription extends AbstractGuiDescription {
         if (ModList.get().isLoaded("cloth_config")) {
             settingsButton.setOnClick(() -> Minecraft.getInstance().setScreen(ClothConfigIntegration.getConfigScreen(Minecraft.getInstance().screen)));
         } else {
-            settingsButton.setOnClick(
-                    () -> Minecraft.getInstance().player.displayClientMessage(Component.translatable("warning.mcrgb_forge.noclothconfig"), false));
+            settingsButton.setOnClick(() -> displayClientLocalisedMessage("warning.mcrgb_forge.noclothconfig"));
         }
         updateArmour();
 
@@ -218,161 +208,159 @@ public class ColorsGuiDescription extends AbstractGuiDescription {
         setColor(launchColor);
     }
 
+    public void setColorMode(ColorModel cm) {
+        if (refreshing) return;
+        mode = cm;
+        switch (mode) {
+            case RGB:
+                inputColor = inputColor.toRGB();
+                rLabel.setText(Component.translatable("ui.mcrgb_forge.r_for_red"));
+                rLabel.setColor(0xFFFF0000);
+                gLabel.setText(Component.translatable("ui.mcrgb_forge.g_for_green"));
+                gLabel.setColor(0xFF00FF00);
+                bLabel.setText(Component.translatable("ui.mcrgb_forge.b_for_blue"));
+                bLabel.setColor(0xFF0000FF);
+                rSlider.setMinValue(0);
+                gSlider.setMinValue(0);
+                bSlider.setMinValue(0);
+                rSlider.setMaxValue(255);
+                gSlider.setMaxValue(255);
+                bSlider.setMaxValue(255);
+                rgbButton.setEnabled(false);
+                hsvButton.setEnabled(true);
+                hslButton.setEnabled(true);
+                break;
+            case HSV:
+                inputColor = inputColor.toHSV();
+                rLabel.setText(Component.translatable("ui.mcrgb_forge.h_for_hue_hsv"));
+                rLabel.setColor(0xFF3F3F3F);
+                gLabel.setText(Component.translatable("ui.mcrgb_forge.s_for_sat_hsv"));
+                gLabel.setColor(0xFF3F3F3F);
+                bLabel.setText(Component.translatable("ui.mcrgb_forge.v_for_val_hsv"));
+                bLabel.setColor(0xFF3F3F3F);
+                rSlider.setMinValue(0);
+                gSlider.setMinValue(0);
+                bSlider.setMinValue(0);
+                rSlider.setMaxValue(360);
+                gSlider.setMaxValue(100);
+                bSlider.setMaxValue(100);
+                rgbButton.setEnabled(true);
+                hsvButton.setEnabled(false);
+                hslButton.setEnabled(true);
+                break;
+            case HSL:
+                rLabel.setText(Component.translatable("ui.mcrgb_forge.h_for_hue_hsl"));
+                rLabel.setColor(0xFF3F3F3F);
+                gLabel.setText(Component.translatable("ui.mcrgb_forge.s_for_sat_hsl"));
+                gLabel.setColor(0xFF3F3F3F);
+                bLabel.setText(Component.translatable("ui.mcrgb_forge.l_for_lit_hsl"));
+                bLabel.setColor(0xFF3F3F3F);
+                rSlider.setMinValue(0);
+                gSlider.setMinValue(0);
+                bSlider.setMinValue(0);
+                rSlider.setMaxValue(360);
+                gSlider.setMaxValue(100);
+                bSlider.setMaxValue(100);
+                rgbButton.setEnabled(true);
+                hsvButton.setEnabled(true);
+                hslButton.setEnabled(false);
+                break;
+        }
+        refreshComponents();
+    }
+
     private void onSliderDrag(int value) {
         if (!MCRGBConfig.SLIDER_CONSTANT_UPDATE.get()) {
             colorSort();
         }
     }
 
-    public void setColorMode(ColorModel cm) {
-        try (SilentCloseable ignored = suppressEvents()) {
-            mode = cm;
-
-            switch (mode) {
-                case RGB:
-                    inputColor = inputColor.toRGB();
-                    rLabel.setText(Component.translatable("ui.mcrgb_forge.r_for_red"));
-                    rLabel.setColor(0xFFFF0000);
-                    gLabel.setText(Component.translatable("ui.mcrgb_forge.g_for_green"));
-                    gLabel.setColor(0xFF00FF00);
-                    bLabel.setText(Component.translatable("ui.mcrgb_forge.b_for_blue"));
-                    bLabel.setColor(0xFF0000FF);
-                    rSlider.setMinValue(0);
-                    gSlider.setMinValue(0);
-                    bSlider.setMinValue(0);
-                    rSlider.setMaxValue(255);
-                    gSlider.setMaxValue(255);
-                    bSlider.setMaxValue(255);
-                    rgbButton.setEnabled(false);
-                    hsvButton.setEnabled(true);
-                    hslButton.setEnabled(true);
-                    break;
-                case HSV:
-                    inputColor = inputColor.toHSV();
-                    rLabel.setText(Component.translatable("ui.mcrgb_forge.h_for_hue_hsv"));
-                    rLabel.setColor(0xFF3F3F3F);
-                    gLabel.setText(Component.translatable("ui.mcrgb_forge.s_for_sat_hsv"));
-                    gLabel.setColor(0xFF3F3F3F);
-                    bLabel.setText(Component.translatable("ui.mcrgb_forge.v_for_val_hsv"));
-                    bLabel.setColor(0xFF3F3F3F);
-                    rSlider.setMinValue(0);
-                    gSlider.setMinValue(0);
-                    bSlider.setMinValue(0);
-                    rSlider.setMaxValue(360);
-                    gSlider.setMaxValue(100);
-                    bSlider.setMaxValue(100);
-                    rgbButton.setEnabled(true);
-                    hsvButton.setEnabled(false);
-                    hslButton.setEnabled(true);
-                    break;
-                case HSL:
-                    rLabel.setText(Component.translatable("ui.mcrgb_forge.h_for_hue_hsl"));
-                    rLabel.setColor(0xFF3F3F3F);
-                    gLabel.setText(Component.translatable("ui.mcrgb_forge.s_for_sat_hsl"));
-                    gLabel.setColor(0xFF3F3F3F);
-                    bLabel.setText(Component.translatable("ui.mcrgb_forge.l_for_lit_hsl"));
-                    bLabel.setColor(0xFF3F3F3F);
-                    rSlider.setMinValue(0);
-                    gSlider.setMinValue(0);
-                    bSlider.setMinValue(0);
-                    rSlider.setMaxValue(360);
-                    gSlider.setMaxValue(100);
-                    bSlider.setMaxValue(100);
-                    rgbButton.setEnabled(true);
-                    hsvButton.setEnabled(true);
-                    hslButton.setEnabled(false);
-                    break;
-            }
-            refreshComponents();
-        }
-    }
     private void onSliderValueChange(int value) {
-        try (SilentCloseable ignored = suppressEvents()) {
-            inputColor = Color.create(mode, rSlider.getValue(), gSlider.getValue(), bSlider.getValue());
-            refreshComponents();
-        }
+        if (refreshing) return;
+        inputColor = Color.create(mode, rSlider.getValue(), gSlider.getValue(), bSlider.getValue());
+        refreshComponents();
     }
 
     private void onValueEntered(String value) {
-        try (SilentCloseable ignored = suppressEvents()) {
-            if (!rInput.isFocused() && !gInput.isFocused() && !bInput.isFocused()) {
-                return;
-            }
+        if (refreshing) return;
+        if (!rInput.isFocused() && !gInput.isFocused() && !bInput.isFocused()) return;
 
-            int rInputValue = tryParseInt(rInput.getText());
-            int gInputValue = tryParseInt(gInput.getText());
-            int bInputValue = tryParseInt(bInput.getText());
+        int rInputValue = tryParseInt(rInput.getText());
+        int gInputValue = tryParseInt(gInput.getText());
+        int bInputValue = tryParseInt(bInput.getText());
 
-            inputColor = Color.create(mode, rInputValue, gInputValue, bInputValue);
-            refreshComponents();
-        }
+        inputColor = Color.create(mode, rInputValue, gInputValue, bInputValue);
+        refreshComponents();
     }
 
     private void onHexEntered(String value) {
-        try (SilentCloseable ignored = suppressEvents()) {
-            inputColor = new RGB(value);
-            switch (mode) {
-                case RGB:
-                    RGB rgb = inputColor.toRGB();
-                    rSlider.setValue(rgb.red());
-                    rInput.setText(Integer.toString(rgb.red()));
+        if (refreshing) return;
+        inputColor = new RGB(value);
+        switch (mode) {
+            case RGB:
+                RGB rgb = inputColor.toRGB();
+                rSlider.setValue(rgb.red());
+                rInput.setText(Integer.toString(rgb.red()));
 
-                    gSlider.setValue(rgb.green());
-                    gInput.setText(Integer.toString(rgb.green()));
+                gSlider.setValue(rgb.green());
+                gInput.setText(Integer.toString(rgb.green()));
 
-                    bSlider.setValue(rgb.blue());
-                    bInput.setText(Integer.toString(rgb.blue()));
-                    break;
-                case HSV:
-                    HSV hsv = inputColor.toHSV();
-                    rSlider.setValue(hsv.hue());
-                    rInput.setText(Integer.toString(hsv.hue()));
+                bSlider.setValue(rgb.blue());
+                bInput.setText(Integer.toString(rgb.blue()));
+                break;
+            case HSV:
+                HSV hsv = inputColor.toHSV();
+                rSlider.setValue(hsv.hue());
+                rInput.setText(Integer.toString(hsv.hue()));
 
-                    gSlider.setValue(hsv.saturation());
-                    gInput.setText(Integer.toString(hsv.saturation()));
+                gSlider.setValue(hsv.saturation());
+                gInput.setText(Integer.toString(hsv.saturation()));
 
-                    bSlider.setValue(hsv.value());
-                    bInput.setText(Integer.toString(hsv.value()));
-                    break;
-                case HSL:
-                    HSL hsl = inputColor.toHSL();
-                    rSlider.setValue(hsl.hue());
-                    rInput.setText(Integer.toString(hsl.hue()));
+                bSlider.setValue(hsv.value());
+                bInput.setText(Integer.toString(hsv.value()));
+                break;
+            case HSL:
+                HSL hsl = inputColor.toHSL();
+                rSlider.setValue(hsl.hue());
+                rInput.setText(Integer.toString(hsl.hue()));
 
-                    gSlider.setValue(hsl.saturation());
-                    gInput.setText(Integer.toString(hsl.saturation()));
+                gSlider.setValue(hsl.saturation());
+                gInput.setText(Integer.toString(hsl.saturation()));
 
-                    bSlider.setValue(hsl.lightness());
-                    bInput.setText(Integer.toString(hsl.lightness()));
-                    break;
-            }
-            updateArmour();
-            colorSort();
-            refreshComponents();
+                bSlider.setValue(hsl.lightness());
+                bInput.setText(Integer.toString(hsl.lightness()));
+                break;
         }
-
+        updateArmour();
+        colorSort();
+        refreshComponents();
     }
 
     private void refreshComponents() {
-        Number[] values = inputColor.values();
-        rSlider.setValue(values[1].intValue());
-        rInput.setText(Integer.toString(values[1].intValue()));
+        refreshing = true;
+        try {
+            Number[] values = inputColor.values();
+            rSlider.setValue(values[1].intValue());
+            rInput.setText(Integer.toString(values[1].intValue()));
 
-        gSlider.setValue(values[2].intValue());
-        gInput.setText(Integer.toString(values[2].intValue()));
+            gSlider.setValue(values[2].intValue());
+            gInput.setText(Integer.toString(values[2].intValue()));
 
-        bSlider.setValue(values[3].intValue());
-        bInput.setText(Integer.toString(values[3].intValue()));
+            bSlider.setValue(values[3].intValue());
+            bInput.setText(Integer.toString(values[3].intValue()));
 
-        hexInput.setText(inputColor.toHexString());
-        updateArmour();
-        if (colorWheelToggle.getToggle()) {
-            RGB rgb = inputColor.toRGB();
-            int val = Math.max(Math.max(rgb.red(), rgb.green()), rgb.blue());
-            colorWheel.setOpaqueTint(new RGB(val, val, val).argb());
-        }
-        if (MCRGBConfig.SLIDER_CONSTANT_UPDATE.get()) {
-            colorSort();
+            hexInput.setText(inputColor.toHexString());
+            updateArmour();
+            if (colorWheelToggle.getToggle()) {
+                RGB rgb = inputColor.toRGB();
+                int val = Math.max(Math.max(rgb.red(), rgb.green()), rgb.blue());
+                colorWheel.setOpaqueTint(new RGB(val, val, val).argb());
+            }
+            if (MCRGBConfig.SLIDER_CONSTANT_UPDATE.get()) colorSort();
+        } catch (Exception e) {
+            log.error("Error refreshing color components", e);
+        } finally {
+            refreshing = false;
         }
     }
 
@@ -399,7 +387,6 @@ public class ColorsGuiDescription extends AbstractGuiDescription {
 
     public void colorSort() {
         stacks.clear();
-        LAB query = inputColor.toLAB();
         Map<Block, Double> blockScores = new HashMap<>();
         ForgeRegistries.BLOCKS.forEach(block -> {
             List<SpriteDetails> sprites = blockSpriteMap.get(block);
@@ -422,11 +409,7 @@ public class ColorsGuiDescription extends AbstractGuiDescription {
             return Double.compare(dA, dB);
         });
 
-        int totalRows = (int)Math.ceil(stacks.size() / (double)SLOTS_WIDTH);
-        int visibleRows = SLOTS_HEIGHT - 1;
-        int maxScroll = Math.max(0, totalRows - visibleRows);
-
-        scrollBar.setMaxValue(maxScroll);
+        scrollBar.setMaxValue(stacks.size() / SLOTS_WIDTH + SLOTS_WIDTH);
         placeSlots();
     }
 
@@ -514,10 +497,11 @@ public class ColorsGuiDescription extends AbstractGuiDescription {
         }
         inputColor = color;
         hexInput.setText(inputColor.toHexString());
+        scrollBar.setValue(0);
         updateArmour();
         colorSort();
-        scrollBar.setValue(0);
         placeSlots();
+        refreshComponents();
     }
 
     public void openBlockInfoGui(ItemStack stack) {
@@ -559,11 +543,5 @@ public class ColorsGuiDescription extends AbstractGuiDescription {
 
         }
         root.validate(this);
-    }
-
-    @FunctionalInterface
-    private interface SilentCloseable extends AutoCloseable {
-        @Override
-        void close();
     }
 }

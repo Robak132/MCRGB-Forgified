@@ -25,7 +25,6 @@ public final class RGB implements Color {
         this.b = rgb & 0xFF;
     }
 
-
     public RGB(int argb) {
         this.alpha = (argb >>> 24) & 0xFF;
         this.r = (argb >>> 16) & 0xFF;
@@ -36,10 +35,6 @@ public final class RGB implements Color {
     @Override
     public RGB toRGB() {
         return this;
-    }
-
-    public String getHex() {
-        return String.format("#%02X%02X%02X", r, g, b);
     }
 
     public HSV toHSV() {
