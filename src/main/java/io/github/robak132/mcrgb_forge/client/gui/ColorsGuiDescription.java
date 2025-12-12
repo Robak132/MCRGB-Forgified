@@ -2,6 +2,7 @@ package io.github.robak132.mcrgb_forge.client.gui;
 
 import static io.github.robak132.mcrgb_forge.MCRGBMod.MOD_ID;
 
+import io.github.robak132.libgui_forge.client.CottonClientScreen;
 import io.github.robak132.libgui_forge.widget.WButton;
 import io.github.robak132.libgui_forge.widget.WGridPanel;
 import io.github.robak132.libgui_forge.widget.WLabel;
@@ -13,21 +14,22 @@ import io.github.robak132.libgui_forge.widget.data.HorizontalAlignment;
 import io.github.robak132.libgui_forge.widget.data.Insets;
 import io.github.robak132.libgui_forge.widget.data.Texture;
 import io.github.robak132.libgui_forge.widget.icon.TextureIcon;
+import io.github.robak132.mcrgb_forge.client.MCRGBClient;
 import io.github.robak132.mcrgb_forge.client.analysis.ColorVector;
-import io.github.robak132.mcrgb_forge.client.analysis.IItemBlockColorSaver;
 import io.github.robak132.mcrgb_forge.client.analysis.SpriteColor;
 import io.github.robak132.mcrgb_forge.client.analysis.SpriteDetails;
-import io.github.robak132.mcrgb_forge.client.integration.ClothConfigIntegration;
-import io.github.robak132.mcrgb_forge.client.MCRGBClient;
-import io.github.robak132.mcrgb_forge.config.MCRGBConfig;
 import io.github.robak132.mcrgb_forge.client.gui.widgets.WButtonWithTooltip;
-import io.github.robak132.mcrgb_forge.client.gui.widgets.WColorScrollBar;
 import io.github.robak132.mcrgb_forge.client.gui.widgets.WColorGuiSlot;
+import io.github.robak132.mcrgb_forge.client.gui.widgets.WColorScrollBar;
 import io.github.robak132.mcrgb_forge.client.gui.widgets.WColorWheel;
 import io.github.robak132.mcrgb_forge.client.gui.widgets.WGradientSlider;
 import io.github.robak132.mcrgb_forge.client.gui.widgets.WSearchField;
+import io.github.robak132.mcrgb_forge.client.integration.ClothConfigIntegration;
+import io.github.robak132.mcrgb_forge.config.MCRGBConfig;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -35,10 +37,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class ColorGui extends AbstractGuiScreen {
+public class ColorsGuiDescription extends AbstractGuiDescription {
 
     private final List<ItemStack> stacks = new ArrayList<>();
     private final List<WColorGuiSlot> wColorGuiSlots = new ArrayList<>();
@@ -77,7 +80,11 @@ public class ColorGui extends AbstractGuiScreen {
     WPlainPanel inputs = new WPlainPanel();
     WGridPanel armourSlots = new WGridPanel();
 
-    public ColorGui(ColorVector launchColor) {
+    private final Map<Block, List<SpriteDetails>> blockSpriteMap;
+
+    public ColorsGuiDescription(ColorVector launchColor, Map<Block, List<SpriteDetails>> blockSpriteMap) {
+        this.blockSpriteMap = blockSpriteMap;
+
         WButtonWithTooltip refreshButton = new WButtonWithTooltip(new TextureIcon(ResourceLocation.fromNamespaceAndPath(MOD_ID, "refresh.png")),
                 Component.translatable("ui.mcrgb_forge.refresh_info"));
         WButton settingsButton = new WButton(new TextureIcon(ResourceLocation.fromNamespaceAndPath(MOD_ID, "settings.png")));
@@ -95,7 +102,7 @@ public class ColorGui extends AbstractGuiScreen {
         refreshButton.setIconSize(18);
         refreshButton.setAlignment(HorizontalAlignment.LEFT);
         refreshButton.setOnClick(() -> {
-            MCRGBClient.refreshColors();
+            MCRGBClient.triggerScan();
             colorSort();
         });
 
@@ -198,7 +205,8 @@ public class ColorGui extends AbstractGuiScreen {
         if (ModList.get().isLoaded("cloth_config")) {
             settingsButton.setOnClick(() -> Minecraft.getInstance().setScreen(ClothConfigIntegration.getConfigScreen(Minecraft.getInstance().screen)));
         } else {
-            settingsButton.setOnClick(() -> Minecraft.getInstance().player.displayClientMessage(Component.translatable("warning.mcrgb_forge.noclothconfig"), false));
+            settingsButton.setOnClick(
+                    () -> Minecraft.getInstance().player.displayClientMessage(Component.translatable("warning.mcrgb_forge.noclothconfig"), false));
         }
         updateArmour();
 
@@ -504,44 +512,49 @@ public class ColorGui extends AbstractGuiScreen {
         stacks.clear();
         ColorVector query = inputColor;
 
+        Map<Block, Double> blockScores = new HashMap<>();
+
         ForgeRegistries.BLOCKS.forEach(block -> {
-            IItemBlockColorSaver itemBlockColorSaver = (IItemBlockColorSaver) block.asItem();
 
-            for (int j = 0; j < itemBlockColorSaver.mcrgb_forge$getLength(); j++) {
-                double distance = 0;
-                double weightless;
-                double weight;
-                SpriteDetails sprite = itemBlockColorSaver.mcrgb_forge$getSpriteDetails(j);
-                for (int i = 0; i < sprite.getColors().size(); i++) {
-                    SpriteColor spriteColor = sprite.getColors().get(i);
-                    ColorVector color = spriteColor.color();
-                    weight = spriteColor.weight();
+            List<SpriteDetails> sprites = blockSpriteMap.get(block);
+            if (sprites == null || sprites.isEmpty()) return;
 
-                    if (color == null) {
-                        return;
-                    }
-                    weightless = query.distanceSquared(color) + 0.000001;
-                    if (weightless / Math.pow(weight, 5) < distance || i == 0) {
-                        distance = weightless / Math.pow(weight, 5);
-                    }
-                }
+            double best = Double.MAX_VALUE;
 
-                if (distance < itemBlockColorSaver.mcrgb_forge$getScore() || j == 0) {
-                    itemBlockColorSaver.mcrgb_forge$setScore(distance);
+            for (SpriteDetails details : sprites) {
+                for (SpriteColor sc : details.getColors()) {
+                    ColorVector cv = sc.color();
+                    if (cv == null) continue;
+
+                    double w = sc.weight();
+                    double dist = query.distanceSquared(cv) + 0.000001;
+                    dist /= Math.pow(w, 5);
+
+                    if (dist < best)
+                        best = dist;
                 }
             }
-            if (block.getName().getString().toUpperCase().contains(searchField.getText().toUpperCase()) && itemBlockColorSaver.mcrgb_forge$getLength() > 0
-                    && block.isEnabled(Minecraft.getInstance().level.enabledFeatures())) {
+
+            blockScores.put(block, best);
+
+            if (block.getName().getString().toUpperCase()
+                    .contains(searchField.getText().toUpperCase())) {
                 stacks.add(new ItemStack(block));
             }
         });
 
-        scrollBar.setMaxValue(stacks.size() / SLOTS_WIDTH + SLOTS_WIDTH);
-        stacks.sort((is1, is2) -> {
-            double x = ((IItemBlockColorSaver) is1.getItem()).mcrgb_forge$getScore();
-            double y = ((IItemBlockColorSaver) is2.getItem()).mcrgb_forge$getScore();
-            return Double.compare(x, y);
+        // sort by distance
+        stacks.sort((a, b) -> {
+            Block blA = Block.byItem(a.getItem());
+            Block blB = Block.byItem(b.getItem());
+
+            double dA = blockScores.getOrDefault(blA, Double.MAX_VALUE);
+            double dB = blockScores.getOrDefault(blB, Double.MAX_VALUE);
+
+            return Double.compare(dA, dB);
         });
+
+        scrollBar.setMaxValue(stacks.size() / SLOTS_WIDTH + SLOTS_WIDTH);
         placeSlots();
     }
 
@@ -611,7 +624,7 @@ public class ColorGui extends AbstractGuiScreen {
     }
 
     public void openBlockInfoGui(ItemStack stack) {
-        Minecraft.getInstance().setScreen(new ColorScreen(new BlockInfoScreen(stack, inputColor)));
+        Minecraft.getInstance().setScreen(new CottonClientScreen(new BlockGuiDescription(stack, inputColor, this)));
     }
 
     public void toggleColorWheel(boolean isToggled) {
@@ -654,4 +667,6 @@ public class ColorGui extends AbstractGuiScreen {
     public enum ColorMode {
         RGB, HSV, HSL
     }
+
+
 }

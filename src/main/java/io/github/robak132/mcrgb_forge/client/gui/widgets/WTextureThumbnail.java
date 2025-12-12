@@ -2,15 +2,15 @@ package io.github.robak132.mcrgb_forge.client.gui.widgets;
 
 import io.github.robak132.libgui_forge.widget.WSprite;
 import io.github.robak132.libgui_forge.widget.data.InputResult;
-import io.github.robak132.mcrgb_forge.client.gui.BlockInfoScreen;
+import io.github.robak132.mcrgb_forge.client.gui.BlockGuiDescription;
 import net.minecraft.resources.ResourceLocation;
 
 public class WTextureThumbnail extends WSprite {
 
     int index;
-    BlockInfoScreen bigui;
+    BlockGuiDescription bigui;
 
-    public WTextureThumbnail(ResourceLocation image, float u1, float v1, float u2, float v2, int i, BlockInfoScreen gui) {
+    public WTextureThumbnail(ResourceLocation image, float u1, float v1, float u2, float v2, int i, BlockGuiDescription gui) {
         super(image, u1, v1, u2, v2);
         this.index = i;
         this.bigui = gui;

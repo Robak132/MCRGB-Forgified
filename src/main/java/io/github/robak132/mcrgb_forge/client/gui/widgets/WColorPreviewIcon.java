@@ -3,7 +3,7 @@ package io.github.robak132.mcrgb_forge.client.gui.widgets;
 import io.github.robak132.mcrgb_forge.client.analysis.ColorVector;
 import io.github.robak132.libgui_forge.widget.WSprite;
 import io.github.robak132.libgui_forge.widget.data.InputResult;
-import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiScreen;
+import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiDescription;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.resources.ResourceLocation;
@@ -12,12 +12,12 @@ import net.minecraft.resources.ResourceLocation;
 public class WColorPreviewIcon extends WSprite {
 
     int color = 0xFFFFFF;
-    AbstractGuiScreen gui;
+    AbstractGuiDescription gui;
     @Setter
     @Getter
     boolean interactable = true;
 
-    public WColorPreviewIcon(ResourceLocation image, AbstractGuiScreen gui) {
+    public WColorPreviewIcon(ResourceLocation image, AbstractGuiDescription gui) {
         super(image);
         this.gui = gui;
     }

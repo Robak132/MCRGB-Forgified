@@ -7,7 +7,7 @@ import io.github.robak132.libgui_forge.widget.WWidget;
 import io.github.robak132.libgui_forge.widget.data.InputResult;
 import io.github.robak132.mcrgb_forge.client.analysis.IItemBlockColorSaver;
 import io.github.robak132.mcrgb_forge.config.MCRGBConfig;
-import io.github.robak132.mcrgb_forge.client.gui.ColorGui;
+import io.github.robak132.mcrgb_forge.client.gui.ColorsGuiDescription;
 import java.util.List;
 import java.util.Objects;
 import net.minecraft.ChatFormatting;
@@ -27,9 +27,9 @@ public class WColorGuiSlot extends WWidget {
 
     public static final ResourceLocation SLOT_TEXTURE = ResourceLocation.fromNamespaceAndPath(LibGui.MOD_ID, "textures/widget/item_slot.png");
     ItemStack stack;
-    ColorGui parentGui;
+    ColorsGuiDescription parentGui;
 
-    public WColorGuiSlot(ItemStack stack, ColorGui parentGui) {
+    public WColorGuiSlot(ItemStack stack, ColorsGuiDescription parentGui) {
         this.stack = stack;
         this.parentGui = parentGui;
     }

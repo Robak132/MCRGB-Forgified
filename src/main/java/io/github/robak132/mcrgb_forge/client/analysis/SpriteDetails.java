@@ -9,6 +9,9 @@ public class SpriteDetails {
     private String name;
     private List<SpriteColor> colors = new ArrayList<>();
 
+    public SpriteDetails() {
+    }
+
     public SpriteDetails(String name, List<SpriteColor> colors) {
         this.name = name;
         this.colors = colors;

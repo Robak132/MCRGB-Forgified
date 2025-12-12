@@ -4,7 +4,7 @@ import static io.github.robak132.mcrgb_forge.MCRGBMod.MOD_ID;
 
 import io.github.robak132.libgui_forge.client.ScreenDrawing;
 import io.github.robak132.libgui_forge.widget.data.InputResult;
-import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiScreen;
+import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiDescription;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
@@ -14,7 +14,7 @@ public class WColorWheel extends WPickableTexture {
     int cursorY = (height) / 2;
     boolean beenClicked = false;
 
-    public WColorWheel(ResourceLocation image, float u1, float v1, float u2, float v2, AbstractGuiScreen parentGui) {
+    public WColorWheel(ResourceLocation image, float u1, float v1, float u2, float v2, AbstractGuiDescription parentGui) {
         super(image, u1, v1, u2, v2, parentGui);
     }
 

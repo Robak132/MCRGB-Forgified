@@ -7,7 +7,7 @@ import io.github.robak132.libgui_forge.widget.WPlainPanel;
 import io.github.robak132.libgui_forge.widget.data.HorizontalAlignment;
 import io.github.robak132.libgui_forge.widget.icon.TextureIcon;
 import io.github.robak132.mcrgb_forge.client.analysis.Palette;
-import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiScreen;
+import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiDescription;
 import java.util.ArrayList;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -18,13 +18,13 @@ public class WPaletteWidget extends WPlainPanel {
     int slotsWidth = 9;
     ArrayList<WColorPreviewIcon> savedColors = new ArrayList<>();
     Palette palette;
-    AbstractGuiScreen cg;
+    AbstractGuiDescription cg;
     WSmallButton editButton = new WSmallButton(new TextureIcon(ResourceLocation.fromNamespaceAndPath(MOD_ID, "edit.png")),
             Component.translatable("ui.mcrgb_forge.edit_palette_info"));
     WSmallButton deleteButton = new WSmallButton(new TextureIcon(ResourceLocation.fromNamespaceAndPath(MOD_ID, "delete.png")),
             Component.translatable("ui.mcrgb_forge.delete_palette_info"));
 
-    public void buildPaletteWidget(AbstractGuiScreen cg) {
+    public void buildPaletteWidget(AbstractGuiDescription cg) {
 
         this.setBackgroundPainter(BackgroundPainter.createColorful(0xFFFFFF));
         for (int i = 0; i < slotsWidth; i++) {

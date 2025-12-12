@@ -5,7 +5,7 @@ import io.github.robak132.mcrgb_forge.client.analysis.ColorVector;
 import io.github.robak132.libgui_forge.client.BackgroundPainter;
 import io.github.robak132.libgui_forge.widget.WBox;
 import io.github.robak132.libgui_forge.widget.data.Insets;
-import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiScreen;
+import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiDescription;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,7 +20,7 @@ public class WBlockInfoBox extends WBox {
 
     int lineCount = 0;
 
-    public WBlockInfoBox(Direction.Plane axis, IItemBlockColorSaver item, AbstractGuiScreen gui) {
+    public WBlockInfoBox(Direction.Plane axis, IItemBlockColorSaver item, AbstractGuiDescription gui) {
         super(axis);
         setInsets(Insets.ROOT_PANEL);
         for (int i = 0; i < item.mcrgb_forge$getLength(); i++) {

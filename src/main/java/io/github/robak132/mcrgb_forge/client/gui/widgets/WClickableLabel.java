@@ -3,7 +3,7 @@ package io.github.robak132.mcrgb_forge.client.gui.widgets;
 import io.github.robak132.mcrgb_forge.client.analysis.ColorVector;
 import io.github.robak132.libgui_forge.widget.WLabel;
 import io.github.robak132.libgui_forge.widget.data.InputResult;
-import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiScreen;
+import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiDescription;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -13,11 +13,11 @@ import java.util.List;
 
 public class WClickableLabel extends WLabel {
     ColorVector color;
-    AbstractGuiScreen gui;
+    AbstractGuiDescription gui;
     Component textUnhovered = text;
     MutableComponent textHovered = Component.empty();
 
-    public WClickableLabel(Component text, ColorVector color, AbstractGuiScreen gui) {
+    public WClickableLabel(Component text, ColorVector color, AbstractGuiDescription gui) {
         super(text);
         this.color = color;
         this.gui = gui;

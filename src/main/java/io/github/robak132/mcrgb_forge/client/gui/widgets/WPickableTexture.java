@@ -4,7 +4,7 @@ import io.github.robak132.mcrgb_forge.client.analysis.ColorVector;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.robak132.libgui_forge.widget.WSprite;
 import io.github.robak132.libgui_forge.widget.data.InputResult;
-import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiScreen;
+import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiDescription;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
@@ -26,11 +26,11 @@ public class WPickableTexture extends WSprite {
 
     Boolean isTransparent = false;
 
-    AbstractGuiScreen gui;
+    AbstractGuiDescription gui;
 
     int glID;
 
-    public WPickableTexture(ResourceLocation image, float u1, float v1, float u2, float v2, AbstractGuiScreen parentGui) {
+    public WPickableTexture(ResourceLocation image, float u1, float v1, float u2, float v2, AbstractGuiDescription parentGui) {
         super(image, u1, v1, u2, v2);
         glID = Minecraft.getInstance().getTextureManager().getTexture(image).getId();
         //get width and height from OpenGL by binding texture

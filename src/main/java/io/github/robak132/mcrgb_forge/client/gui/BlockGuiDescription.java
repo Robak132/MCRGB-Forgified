@@ -1,8 +1,9 @@
 package io.github.robak132.mcrgb_forge.client.gui;
 
 import static io.github.robak132.mcrgb_forge.MCRGBMod.MOD_ID;
-import static io.github.robak132.mcrgb_forge.client.MCRGBClient.getSprites;
+import static io.github.robak132.mcrgb_forge.client.analysis.ColorScanner.getSprites;
 
+import io.github.robak132.libgui_forge.client.CottonClientScreen;
 import io.github.robak132.libgui_forge.widget.WButton;
 import io.github.robak132.libgui_forge.widget.WGridPanel;
 import io.github.robak132.libgui_forge.widget.WLabel;
@@ -26,7 +27,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 
-public class BlockInfoScreen extends AbstractGuiScreen {
+public class BlockGuiDescription extends AbstractGuiDescription {
 
     WLabel label = new WLabel(Component.translatable("ui.mcrgb_forge.header"));
     WBlockInfoBox infoBox;
@@ -36,7 +37,7 @@ public class BlockInfoScreen extends AbstractGuiScreen {
     ArrayList<TextureAtlasSprite> spritesAL = new ArrayList<>();
 
 
-    public BlockInfoScreen(ItemStack stack, ColorVector launchColor) {
+    public BlockGuiDescription(ItemStack stack, ColorVector launchColor, ColorsGuiDescription parent) {
         ResourceLocation backIdentifier = ResourceLocation.fromNamespaceAndPath(MOD_ID, "back.png");
         TextureIcon backIcon = new TextureIcon(backIdentifier);
         WButton backButton = new WButtonWithTooltip(backIcon, Component.translatable("ui.mcrgb_forge.back_info"));
@@ -58,7 +59,7 @@ public class BlockInfoScreen extends AbstractGuiScreen {
         backButton.setIconSize(18);
         backButton.setAlignment(HorizontalAlignment.LEFT);
 
-        backButton.setOnClick(() -> Minecraft.getInstance().setScreen(new ColorScreen(new ColorGui(inputColor))));
+        backButton.setOnClick(() -> Minecraft.getInstance().setScreen(new CottonClientScreen(parent)));
 
         infoBox = new WBlockInfoBox(Direction.Plane.VERTICAL, (IItemBlockColorSaver) stack.getItem(), this);
         infoScrollPanel = new WScrollPanel(infoBox);

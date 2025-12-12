@@ -13,7 +13,7 @@ import io.github.robak132.libgui_forge.widget.WPlainPanel;
 import io.github.robak132.libgui_forge.widget.data.HorizontalAlignment;
 import io.github.robak132.libgui_forge.widget.data.VerticalAlignment;
 import io.github.robak132.libgui_forge.widget.icon.TextureIcon;
-import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiScreen;
+import io.github.robak132.mcrgb_forge.client.gui.AbstractGuiDescription;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -32,9 +32,9 @@ public class WSavedPalettesArea extends WPlainPanel {
     WPaletteWidget editingPalette = null;
     WListPanel<Palette, WPaletteWidget> paletteList;
 
-    AbstractGuiScreen cg;
+    AbstractGuiDescription cg;
 
-    public WSavedPalettesArea(AbstractGuiScreen gui, int slotsWidth, int slotsHeight) {
+    public WSavedPalettesArea(AbstractGuiDescription gui, int slotsWidth, int slotsHeight) {
         this.cg = gui;
         BiConsumer<Palette, WPaletteWidget> configurator = (Palette p, WPaletteWidget pwig) -> {
             pwig.cg = cg;

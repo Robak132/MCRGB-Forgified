@@ -3,6 +3,7 @@ package io.github.robak132.mcrgb_forge.client.analysis;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import net.minecraft.world.level.block.Block;
 
 /**
  * Storage class for block color data.
@@ -15,17 +16,22 @@ public class BlockColorStorage {
      * The block's description ID (e.g., "block.minecraft.stone").
      * This is used as a stable lookup key during load.
      */
-    private String blockId;
+    private Block block;
 
     /**
      * The sprite-level coloring results extracted from the block model.
      */
-    private final List<SpriteDetails> spriteDetails = new ArrayList<>();
+    private List<SpriteDetails> spriteDetails = new ArrayList<>();
 
     public BlockColorStorage() {}
 
-    public BlockColorStorage(String blockId) {
-        this.blockId = blockId;
+    public BlockColorStorage(Block block) {
+        this.block = block;
+    }
+
+    public BlockColorStorage(Block block, List<SpriteDetails> spriteDetails) {
+        this.block = block;
+        this.spriteDetails = spriteDetails;
     }
 
     public void addSpriteDetails(SpriteDetails details) {

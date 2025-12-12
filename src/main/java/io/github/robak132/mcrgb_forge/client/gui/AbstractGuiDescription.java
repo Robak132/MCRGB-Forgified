@@ -11,7 +11,7 @@ import io.github.robak132.mcrgb_forge.client.gui.widgets.WSavedPalettesArea;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-public abstract class AbstractGuiScreen extends LightweightGuiDescription {
+public abstract class AbstractGuiDescription extends LightweightGuiDescription {
 
     static final int SLOTS_HEIGHT = 7;
     static final int SLOTS_WIDTH = 9;
